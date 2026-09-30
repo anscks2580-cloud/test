@@ -162,7 +162,7 @@ body.menu-open .menu-toggle span:nth-child(2) { width: 22px; transform: translat
   gap: 56px;
 }
 .drawer-nav { margin: auto 0 auto auto; width: min(100%, 400px); }
-.drawer-list { list-style: none; border-top: 1px solid var(--line); }
+.drawer-list { list-style: none; }
 .drawer-list li {
   border-bottom: 1px solid var(--line);
   opacity: 0;
