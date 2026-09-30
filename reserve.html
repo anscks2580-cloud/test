@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="LOTV 예약 안내 및 환불·취소 규정.">
+<meta property="og:title" content="Reserve | LOTV 로토브 스냅">
+<title>Reserve | LOTV l 로토브 스냅</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&family=Noto+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/lotv.css">
+<script>document.documentElement.classList.add('js');</script>
+
+<style>
+/* ── 서브페이지 공통 머리 ── */
+.page-head {
+  padding: calc(var(--header-h) + clamp(64px, 9vw, 128px)) 0 clamp(40px, 5vw, 64px);
+}
+.page-title {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: clamp(26px, 2.4vw, 34px);
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+}
+.page-sub {
+  margin-top: 14px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+}
+
+.reserve { padding-bottom: var(--section); }
+.reserve-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--gap);
+}
+.reserve-main { grid-column: 1 / span 6; }
+.reserve-side { grid-column: 8 / span 5; }
+
+.reserve-title {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(22px, 2.1vw, 30px);
+  line-height: 1.45;
+  letter-spacing: 0.02em;
+}
+.reserve-sub {
+  margin-top: 32px;
+  font-size: 13.5px;
+  line-height: 2.1;
+  color: var(--ink-soft);
+}
+.reserve-sub strong { font-weight: 400; color: var(--ink); }
+.reserve-list {
+  list-style: none;
+  margin-top: 28px;
+  border-top: 1px solid var(--line);
+}
+.reserve-list li {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+.reserve-main .btn { margin-top: 44px; }
+
+.policy-box {
+  padding: clamp(32px, 3.4vw, 44px);
+  background: var(--warm-white);
+  border: 1px solid var(--line);
+}
+.policy-label {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+.policy-notice {
+  font-size: 13px;
+  line-height: 2;
+  color: var(--ink-soft);
+}
+.policy-box .btn { margin-top: 28px; min-height: 44px; padding: 0 26px; font-size: 11.5px; }
+
+@media (max-width: 900px) {
+  .reserve-main, .reserve-side { grid-column: 1 / -1; }
+  .reserve-side { order: -1; margin-bottom: 56px; }
+}
+@media (max-width: 480px) {
+  .reserve-main .btn, .policy-box .btn { width: 100%; }
+}
+
+</style>
+
+<script data-goatcounter="https://lotv.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head>
+
+<body data-page="reserve">
+
+<!-- ── HEADER (공통) ── -->
+<header class="site-header">
+  <a class="brand" href="index.html" aria-label="LOTV 메인으로">LOTV</a>
+  <button class="menu-toggle" type="button" aria-controls="site-drawer" aria-expanded="false" aria-label="메뉴 열기">
+    <span></span><span></span>
+  </button>
+</header>
+
+<!-- ── DRAWER MENU (공통) ── -->
+<div class="drawer" id="site-drawer" aria-hidden="true" inert>
+  <div class="drawer-inner">
+    <nav class="drawer-nav" aria-label="주요 메뉴">
+      <ul class="drawer-list">
+        <li><a class="drawer-link" href="about.html"   data-nav="about"><span class="drawer-en">About</span><span class="drawer-ko">소개</span></a></li>
+        <li><a class="drawer-link" href="gallery.html" data-nav="gallery"><span class="drawer-en">Gallery</span><span class="drawer-ko">갤러리</span></a></li>
+        <li><a class="drawer-link" href="package.html" data-nav="package"><span class="drawer-en">Package</span><span class="drawer-ko">상품 안내</span></a></li>
+        <li><a class="drawer-link" href="reserve.html" data-nav="reserve"><span class="drawer-en">Reserve</span><span class="drawer-ko">예약 안내</span></a></li>
+      </ul>
+    </nav>
+    <div class="drawer-foot">
+      <p class="drawer-tagline">Lily of the Valley Snap</p>
+      <div class="drawer-contact">
+        <a href="https://instagram.com/lotv.snap" target="_blank" rel="noopener"><small>Instagram</small>@lotv.snap</a>
+        <a href="https://pf.kakao.com/_xdLaxjX" target="_blank" rel="noopener"><small>KakaoTalk</small>채널 LOTV</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main>
+  <header class="page-head">
+    <div class="container">
+      <h1 class="page-title">Reservation &amp; Policy</h1>
+    </div>
+  </header>
+
+  <section class="reserve" aria-labelledby="reserve-title">
+    <div class="container reserve-grid">
+
+      <div class="reserve-main">
+        <h2 class="reserve-title" id="reserve-title">" Reserve the day<br>we'll capture together "</h2>
+        <p class="reserve-sub">
+          함께할 소중한 날을 위해<br>
+          아래 정보를 카카오톡 채널 <strong>LOTV</strong>로 보내주세요.
+        </p>
+        <ul class="reserve-list">
+          <li>성함</li>
+          <li>연락처</li>
+          <li>일시</li>
+          <li>베뉴명 (홀명 포함)</li>
+          <li>추가 구성 신청 여부</li>
+        </ul>
+        <a class="btn" href="https://pf.kakao.com/_xdLaxjX" target="_blank" rel="noopener">카카오톡 채널 상담하기</a>
+      </div>
+
+      <!-- 환불 규정 -->
+      <aside class="reserve-side" aria-label="환불 및 취소 규정">
+        <div class="policy-box">
+          <p class="policy-label">환불 및 취소 규정</p>
+          <p class="policy-notice">예약 신청 전 환불 및 취소 규정을<br>반드시 확인해 주세요.<br>예약 진행 시 해당 규정에<br>동의한 것으로 간주됩니다.</p>
+          <a class="btn" href="https://blog.naver.com/lotv_snap/224299487971" target="_blank" rel="noopener">환불 규정 확인</a>
+        </div>
+      </aside>
+
+    </div>
+  </section>
+</main>
+
+<!-- ── FOOTER (공통) ── -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand-block">
+        <a class="footer-brand" href="index.html">LOTV</a>
+        <p class="footer-tagline">Every moment we capture becomes a memory that lingers.</p>
+      </div>
+      <div class="footer-col footer-col--contact">
+        <span class="footer-label">Contact</span>
+        <ul>
+          <li><a href="https://instagram.com/lotv.snap" target="_blank" rel="noopener">Instagram @lotv.snap</a></li>
+          <li><a href="https://pf.kakao.com/_xdLaxjX" target="_blank" rel="noopener">카카오톡 채널 LOTV</a></li>
+        </ul>
+      </div>
+      <nav class="footer-col footer-col--menu" aria-label="하단 메뉴">
+        <span class="footer-label">Menu</span>
+        <ul>
+          <li><a href="about.html">About</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="package.html">Package</a></li>
+          <li><a href="reserve.html">Reserve</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <p><span>상호명 : 엘오티브이(LOTV)</span><span>사업자등록번호 : 349-29-02113</span></p>
+      <p class="footer-copy">© 2026 LOTV SNAP. All Rights Reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ── 카카오톡 플로팅 버튼 (공통) ── -->
+<a class="kakao-float" href="https://pf.kakao.com/_xdLaxjX" target="_blank" rel="noopener" aria-label="카카오톡 문의">
+  <div class="kakao-float-btn">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M12 3C6.477 3 2 6.806 2 11.5c0 2.93 1.738 5.519 4.381 7.077L5.5 22l4.13-2.2A11.6 11.6 0 0 0 12 20c5.523 0 10-3.806 10-8.5S17.523 3 12 3Z" fill="#3A1D1D"/>
+    </svg>
+  </div>
+  <span class="kakao-float-label">카카오톡 문의</span>
+</a>
+
+<script src="js/lotv.js"></script>
+</body>
+</html>

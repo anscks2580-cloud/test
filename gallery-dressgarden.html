@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>드레스가든 — LOTV Gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&family=Noto+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/lotv.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #F2EFE8;
+    --cream-dark: #E8E3D8;
+    --ink: #1C1A17;
+    --ink-soft: #5A5650;
+    --warm-white: #FAF8F4;
+    --accent: #9B8E7A;
+  }
+  body { background: var(--cream); color: var(--ink); font-family: 'Jost', sans-serif; font-weight: 300; }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 24px 48px; display: flex; align-items: center; justify-content: space-between;
+    background: rgba(242,239,232,0.94); backdrop-filter: blur(10px);
+    border-bottom: 0.5px solid rgba(28,26,23,0.08);
+  }
+  .nav-logo { text-decoration: none; color: var(--ink); font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; letter-spacing: 0.18em; }
+  .nav-back { text-decoration: none; color: var(--ink-soft); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; display: flex; align-items: center; gap: 8px; transition: color 0.2s; }
+  .nav-back:hover { color: var(--ink); }
+
+  .page-header {
+    padding: 140px 48px 60px;
+  }
+  .page-eyebrow { font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+  .page-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(36px, 5vw, 56px); font-weight: 300; }
+
+  .photo-grid {
+    padding: 0 48px 100px;
+    columns: 3;
+    column-gap: 16px;
+  }
+  .photo-item {
+    break-inside: avoid;
+    margin-bottom: 16px;
+    overflow: hidden;
+    background: var(--cream-dark);
+    cursor: pointer;
+    transition: opacity 0.3s;
+  }
+  .photo-item:hover { opacity: 0.88; }
+  .photo-item img { width: 100%; height: auto; display: block; }
+
+  /* 라이트박스 */
+  .lightbox {
+    display: none;
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(28,26,23,0.95);
+    align-items: center; justify-content: center;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox-img { max-width: 90vw; max-height: 90vh; object-fit: contain; }
+  .lightbox-close {
+    position: absolute; top: 24px; right: 32px;
+    color: rgba(242,239,232,0.6); font-size: 28px; cursor: pointer; background: none; border: none;
+    transition: color 0.2s;
+  }
+  .lightbox-close:hover { color: var(--cream); }
+  .lightbox-prev, .lightbox-next {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    color: rgba(242,239,232,0.5); font-size: 24px; cursor: pointer;
+    background: none; border: none; padding: 16px; transition: color 0.2s;
+  }
+  .lightbox-prev { left: 16px; }
+  .lightbox-next { right: 16px; }
+  .lightbox-prev:hover, .lightbox-next:hover { color: var(--cream); }
+  .lightbox-counter { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); color: rgba(242,239,232,0.4); font-size: 11px; letter-spacing: 0.2em; }
+
+  @media (max-width: 768px) {
+    nav { padding: 16px 24px; }
+    .page-header { padding: 100px 24px 40px; }
+    .photo-grid { padding: 0 24px 80px; columns: 2; column-gap: 10px; }
+  }
+</style>
+<script data-goatcounter="https://lotv.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<style id="lotv-renewal">
+/* ── 리뉴얼 공통 오버라이드: 새 헤더/푸터에 맞춰 여백·글씨 크기만 조정 (사진 배치·비율은 그대로) ── */
+body { background: var(--paper); line-height: 1.6; letter-spacing: 0.02em; }
+.site-footer .container { max-width: none; }
+
+/* 타입 A: page-header + photo-grid */
+.page-header { padding: calc(var(--header-h) + clamp(56px, 8vw, 112px)) var(--gutter) clamp(36px, 5vw, 56px); }
+.page-eyebrow { font-size: 11px; letter-spacing: 0.14em; text-transform: none; color: var(--accent); margin-bottom: 14px; }
+.page-title { font-size: clamp(24px, 2.2vw, 30px); letter-spacing: 0.04em; line-height: 1.15; }
+.photo-grid { padding-left: var(--gutter); padding-right: var(--gutter); padding-bottom: clamp(96px, 12vw, 160px); }
+
+/* 타입 B: gallery-hero + 큰 메인 이미지 */
+.gallery-hero { padding: calc(var(--header-h) + clamp(48px, 7vw, 96px)) var(--gutter) clamp(36px, 5vw, 56px); background: var(--paper); }
+.gallery-hero-eyebrow { font-size: 11px; letter-spacing: 0.14em; text-transform: none; }
+.gallery-hero-title { font-size: clamp(24px, 2.2vw, 30px); letter-spacing: 0.04em; line-height: 1.15; margin-bottom: 14px; }
+.gallery-hero-sub { font-size: 11px; letter-spacing: 0.1em; }
+.gallery-section { padding-left: var(--gutter); padding-right: var(--gutter); }
+
+/* 타입 C: 풀블리드 page-hero */
+.page-hero { padding-left: var(--gutter); padding-right: var(--gutter); }
+.page-hero-back { left: var(--gutter); top: calc(var(--header-h) + 20px); font-size: 11px; letter-spacing: 0.14em; text-transform: none; }
+.venue-label { font-size: 11px; letter-spacing: 0.14em; text-transform: none; }
+.venue-title { font-size: clamp(26px, 2.6vw, 36px); letter-spacing: 0.04em; }
+.venue-date { font-size: 11px; letter-spacing: 0.12em; }
+
+</style>
+</head>
+<body data-page="gallery">
+<!-- ── HEADER (공통) ── -->
+<header class="site-header">
+  <a class="brand" href="index.html" aria-label="LOTV 메인으로">LOTV</a>
+  <button class="menu-toggle" type="button" aria-controls="site-drawer" aria-expanded="false" aria-label="메뉴 열기">
+    <span></span><span></span>
+  </button>
+</header>
+
+<!-- ── DRAWER MENU (공통) ── -->
+<div class="drawer" id="site-drawer" aria-hidden="true" inert>
+  <div class="drawer-inner">
+    <div class="drawer-nav" role="navigation" aria-label="주요 메뉴">
+      <ul class="drawer-list">
+        <li><a class="drawer-link" href="about.html"   data-nav="about"><span class="drawer-en">About</span><span class="drawer-ko">소개</span></a></li>
+        <li><a class="drawer-link" href="gallery.html" data-nav="gallery"><span class="drawer-en">Gallery</span><span class="drawer-ko">갤러리</span></a></li>
+        <li><a class="drawer-link" href="package.html" data-nav="package"><span class="drawer-en">Package</span><span class="drawer-ko">상품 안내</span></a></li>
+        <li><a class="drawer-link" href="reserve.html" data-nav="reserve"><span class="drawer-en">Reserve</span><span class="drawer-ko">예약 안내</span></a></li>
+      </ul>
+    </div>
+    <div class="drawer-foot">
+      <p class="drawer-tagline">Lily of the Valley Snap</p>
+      <div class="drawer-contact">
+        <a href="https://instagram.com/lotv.snap" target="_blank" rel="noopener"><small>Instagram</small>@lotv.snap</a>
+        <a href="https://pf.kakao.com/_xdLaxjX" target="_blank" rel="noopener"><small>KakaoTalk</small>채널 LOTV</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="page-header">
+  <p class="page-eyebrow">웨딩홀 · Wedding Hall</p>
+  <h1 class="page-title">드레스가든</h1>
+</div>
+
+<div class="photo-grid" id="photoGrid">
+  <div class="photo-item" onclick="openLightbox(0)"><img src="dressgarden/dressgarden_main_wm.jpg" alt="드레스가든"></div>
+  <div class="photo-item" onclick="openLightbox(1)"><img src="dressgarden/dressgarden_01.jpg" alt="드레스가든"></div>
+  <div class="photo-item" onclick="openLightbox(2)"><img src="dressgarden/dressgarden_02.jpg" alt="드레스가든"></div>
+  <div class="photo-item" onclick="openLightbox(3)"><img src="dressgarden/dressgarden_03.jpg" alt="드레스가든"></div>
+  <div class="photo-item" onclick="openLightbox(4)"><img src="dressgarden/dressgarden_04.jpg" alt="드레스가든"></div>
+  <div class="photo-item" onclick="openLightbox(5)"><img src="dressgarden/dressgarden_05.jpg" alt="드레스가든"></div>
+  <div class="photo-item" onclick="openLightbox(6)"><img src="dressgarden/dressgarden_06.jpg" alt="드레스가든"></div>
+  <div class="photo-item" onclick="openLightbox(7)"><img src="dressgarden/dressgarden_07.jpg" alt="드레스가든"></div>
+  <div class="photo-item" onclick="openLightbox(8)"><img src="dressgarden/dressgarden_08.jpg" alt="드레스가든"></div>
+  <div class="photo-item" onclick="openLightbox(9)"><img src="dressgarden/dressgarden_09.jpg" alt="드레스가든"></div>
+  <div class="photo-item" onclick="openLightbox(10)"><img src="dressgarden/dressgarden_10.jpg" alt="드레스가든"></div>
+  <div class="photo-item" onclick="openLightbox(11)"><img src="dressgarden/dressgarden_11.jpg" alt="드레스가든"></div>
+  <div class="photo-item" onclick="openLightbox(12)"><img src="dressgarden/dressgarden_12.jpg" alt="드레스가든"></div>
+  <div class="photo-item" onclick="openLightbox(13)"><img src="dressgarden/dressgarden_13.jpg" alt="드레스가든"></div>
+</div>
+
+<!-- ── FOOTER (공통) ── -->
+<div class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand-block">
+        <a class="footer-brand" href="index.html">LOTV</a>
+        <p class="footer-tagline">Every moment we capture becomes a memory that lingers.</p>
+      </div>
+      <div class="footer-col footer-col--contact">
+        <span class="footer-label">Contact</span>
+        <ul>
+          <li><a href="https://instagram.com/lotv.snap" target="_blank" rel="noopener">Instagram @lotv.snap</a></li>
+          <li><a href="https://pf.kakao.com/_xdLaxjX" target="_blank" rel="noopener">카카오톡 채널 LOTV</a></li>
+        </ul>
+      </div>
+      <div class="footer-col footer-col--menu" role="navigation" aria-label="하단 메뉴">
+        <span class="footer-label">Menu</span>
+        <ul>
+          <li><a href="about.html">About</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="package.html">Package</a></li>
+          <li><a href="reserve.html">Reserve</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p><span>상호명 : 엘오티브이(LOTV)</span><span>사업자등록번호 : 349-29-02113</span></p>
+      <p class="footer-copy">© 2026 LOTV SNAP. All Rights Reserved.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 라이트박스 -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <button class="lightbox-prev" onclick="changePhoto(-1)">‹</button>
+  <img class="lightbox-img" id="lightboxImg" src="" alt="" oncontextmenu="return false;" ondragstart="return false;">
+  <button class="lightbox-next" onclick="changePhoto(1)">›</button>
+  <span class="lightbox-counter" id="lightboxCounter"></span>
+</div>
+
+<script>
+const photos = [
+  'dressgarden/dressgarden_main_wm.jpg',
+  'dressgarden/dressgarden_01.jpg',
+  'dressgarden/dressgarden_02.jpg',
+  'dressgarden/dressgarden_03.jpg',
+  'dressgarden/dressgarden_04.jpg',
+  'dressgarden/dressgarden_05.jpg',
+  'dressgarden/dressgarden_06.jpg',
+  'dressgarden/dressgarden_07.jpg',
+  'dressgarden/dressgarden_08.jpg',
+  'dressgarden/dressgarden_09.jpg',
+  'dressgarden/dressgarden_10.jpg',
+  'dressgarden/dressgarden_11.jpg',
+  'dressgarden/dressgarden_12.jpg',
+  'dressgarden/dressgarden_13.jpg'
+];
+let current = 0;
+function openLightbox(i) {
+  current = i;
+  document.getElementById('lightboxImg').src = photos[i];
+  document.getElementById('lightboxCounter').textContent = (i+1) + ' / ' + photos.length;
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function changePhoto(dir) {
+  current = (current + dir + photos.length) % photos.length;
+  document.getElementById('lightboxImg').src = photos[current];
+  document.getElementById('lightboxCounter').textContent = (current+1) + ' / ' + photos.length;
+}
+document.getElementById('lightbox').addEventListener('click', function(e) {
+  if (e.target === this) closeLightbox();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft') changePhoto(-1);
+  if (e.key === 'ArrowRight') changePhoto(1);
+});
+
+/* ── 이미지 보호 ── */
+document.addEventListener('contextmenu', e => { if (e.target.tagName === 'IMG') e.preventDefault(); });
+document.addEventListener('dragstart', e => { if (e.target.tagName === 'IMG') e.preventDefault(); });
+</script>
+<style>
+  img { -webkit-user-select: none; user-select: none; pointer-events: none; -webkit-touch-callout: none; }
+  .photo-item, .lightbox-img { pointer-events: auto; }
+</style>
+<!-- ── 카카오톡 플로팅 버튼 (공통) ── -->
+<a class="kakao-float" href="https://pf.kakao.com/_xdLaxjX" target="_blank" rel="noopener" aria-label="카카오톡 문의">
+  <div class="kakao-float-btn">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M12 3C6.477 3 2 6.806 2 11.5c0 2.93 1.738 5.519 4.381 7.077L5.5 22l4.13-2.2A11.6 11.6 0 0 0 12 20c5.523 0 10-3.806 10-8.5S17.523 3 12 3Z" fill="#3A1D1D"/>
+    </svg>
+  </div>
+  <span class="kakao-float-label">카카오톡 문의</span>
+</a>
+
+<script src="js/lotv.js"></script>
+</body>
+</html>
