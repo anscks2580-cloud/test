@@ -14,58 +14,42 @@
 <script>document.documentElement.classList.add('js');</script>
 
 <style>
-/* ── 서브페이지 공통 머리 ── */
-.page-head {
-  padding: calc(var(--header-h) + clamp(64px, 9vw, 128px)) 0 clamp(40px, 5vw, 64px);
-}
-.page-title {
-  font-family: var(--serif);
-  font-weight: 300;
-  font-size: clamp(26px, 2.4vw, 34px);
-  letter-spacing: 0.04em;
-  line-height: 1.1;
-}
-.page-sub {
-  margin-top: 14px;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  color: var(--ink-soft);
-}
+/* 서브페이지 공통 머리(.page-head / .page-title / .page-sub)는 css/lotv.css */
 
 .reserve { padding-bottom: var(--section); }
 .reserve-grid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   gap: var(--gap);
+  align-items: start;
 }
 .reserve-main { grid-column: 1 / span 6; }
 .reserve-side { grid-column: 8 / span 5; }
 
 .reserve-sub {
-  margin-top: 0;
-  font-size: 13.5px;
-  line-height: 2.1;
+  font-size: 13px;
+  line-height: 2.15;
   color: var(--ink-soft);
 }
 .reserve-sub strong { font-weight: 400; color: var(--ink); }
 .reserve-list {
   list-style: none;
-  margin-top: 28px;
-  border-top: 1px solid var(--line);
+  margin-top: 32px;
+  border-top: 1px solid var(--ink);
 }
 .reserve-list li {
-  padding: 14px 0;
+  padding: 15px 0;
   border-bottom: 1px solid var(--line);
-  font-size: 13px;
+  font-size: 12.5px;
   letter-spacing: 0.04em;
   color: var(--ink);
 }
 .reserve-main .btn { margin-top: 44px; }
 
+/* 환불 규정: 박스 대신 상단 라인 하나로 구분 */
 .policy-box {
-  padding: clamp(32px, 3.4vw, 44px);
-  background: var(--warm-white);
-  border: 1px solid var(--line);
+  padding: clamp(24px, 2.6vw, 32px) 0 0;
+  border-top: 1px solid var(--ink);
 }
 .policy-label {
   font-size: 11px;
@@ -74,11 +58,11 @@
   margin-bottom: 16px;
 }
 .policy-notice {
-  font-size: 13px;
-  line-height: 2;
+  font-size: 12.5px;
+  line-height: 2.05;
   color: var(--ink-soft);
 }
-.policy-box .btn { margin-top: 28px; min-height: 44px; padding: 0 26px; font-size: 11.5px; }
+.policy-box .btn { margin-top: 28px; min-height: 42px; padding: 0 24px; font-size: 11px; }
 
 @media (max-width: 900px) {
   .reserve-main, .reserve-side { grid-column: 1 / -1; }
@@ -87,7 +71,6 @@
 @media (max-width: 480px) {
   .reserve-main .btn, .policy-box .btn { width: 100%; }
 }
-
 </style>
 
 <script data-goatcounter="https://lotv.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>

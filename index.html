@@ -19,21 +19,14 @@
 <style>
 /* ==========================================================================
    INDEX 전용 — 스크롤 없는 한 화면
-   구성 원칙
    · 중앙 축(심볼 → LOTV → 라인 → 영문명 → 한글명) = 브랜드 레이어
-   · 네 모서리(로고 / 햄버거 / 사업자 정보 / 카카오) = 기능 레이어
-     → 모두 같은 좌우 기준선(--edge)과 하단 기준선(--foot-y)에 정렬
+   · 모서리(햄버거 / 사업자 정보 / 카카오) = 기능 레이어
+     → 공통 좌우 기준선(--gutter)과 하단 기준선(--foot-y)에 정렬
+   헤더·햄버거·카카오 기본 스타일은 css/lotv.css 공통
    ========================================================================== */
 :root {
-  --edge:   clamp(22px, 3.2vw, 56px);                 /* 좌우 기준선 */
   --foot-y: clamp(18px, 3.2vh, 34px);                 /* 하단 기준선 */
   --m:      clamp(30px, min(3.7vw, 5.4vh), 52px);     /* LOTV 크기 = Hero 전체 비율의 기준 단위 */
-}
-body[data-page="home"] {
-  --header-h: clamp(64px, 8.4vh, 88px);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
 }
 
 html, body { height: 100%; overflow: hidden; }
@@ -46,7 +39,7 @@ html, body { height: 100%; overflow: hidden; }
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--header-h) var(--edge);
+  padding: var(--header-h) var(--gutter);
   background: var(--paper);
   text-align: center;
 }
@@ -115,8 +108,8 @@ html, body { height: 100%; overflow: hidden; }
 /* ── 하단 사업자 정보 — 기능 레이어 (좌하단 모서리) ─────────────────────── */
 .hero-foot {
   position: absolute;
-  left: var(--edge);
-  right: calc(var(--edge) + 64px);            /* 카카오 버튼 자리 확보 */
+  left: var(--gutter);
+  right: calc(var(--gutter) + 64px);          /* 카카오 버튼 자리 확보 */
   bottom: calc(var(--foot-y) + env(safe-area-inset-bottom, 0px));
   display: flex;
   justify-content: flex-start;
@@ -133,128 +126,11 @@ html, body { height: 100%; overflow: hidden; }
 }
 .hero-foot span { white-space: nowrap; }
 
-/* ── HEADER — 구조 유지, 기준선·비율만 정리 ─────────────────────────────── */
-body[data-page="home"] .site-header {
-  height: var(--header-h);
-  padding-left: var(--edge);
-  padding-right: var(--edge);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-body[data-page="home"] .brand {
-  font-family: var(--serif);
-  font-weight: 500;
-  font-size: 15px;
-  line-height: 1;
-  letter-spacing: 0.34em;
-  text-decoration: none;
-}
-
-/* 햄버거: 긴 선 + 짧은 선, 우측 끝이 --edge 기준선에 정확히 맞도록 */
-body[data-page="home"] .menu-toggle {
-  position: relative;
-  width: 44px;
-  height: 44px;
-  margin-right: -9px;
-  padding: 0;
-  background: none;
-  border: 0;
-  cursor: pointer;
-}
-body[data-page="home"] .menu-toggle span {
-  position: absolute;
-  right: 9px;
-  left: auto;
-  height: 1px;
-  margin: 0;
-  transform: none;
-  transition: top 0.35s var(--ease-out, ease) 0.15s,
-              width 0.35s var(--ease-out, ease),
-              transform 0.35s var(--ease-out, ease);
-}
-body[data-page="home"] .menu-toggle span:nth-child(1) { top: calc(50% - 4px); width: 26px; }
-body[data-page="home"] .menu-toggle span:nth-child(2) { top: calc(50% + 3px); width: 17px; }
-
-body[data-page="home"] .menu-toggle[aria-expanded="true"] span {
-  top: 50%;
-  width: 22px;
-  right: 11px;
-  transition: top 0.35s var(--ease-out, ease),
-              width 0.35s var(--ease-out, ease),
-              transform 0.35s var(--ease-out, ease) 0.15s;
-}
-body[data-page="home"] .menu-toggle[aria-expanded="true"] span:nth-child(1) { transform: rotate(45deg); }
-body[data-page="home"] .menu-toggle[aria-expanded="true"] span:nth-child(2) { transform: rotate(-45deg); }
-
-/* ── 카카오톡 — 우하단 모서리, 사업자 정보와 같은 하단 기준선 ─────────────── */
+/* 카카오: 사업자 정보와 같은 하단 기준선 + 연출 끝무렵 조용히 등장 */
 body[data-page="home"] .kakao-float {
-  position: fixed;
-  right: var(--edge);
   bottom: calc(var(--foot-y) + env(safe-area-inset-bottom, 0px));
-  display: flex;
-  flex-direction: row-reverse;
-  align-items: center;
-  gap: 14px;
-  padding: 0;
-  background: none;
-  box-shadow: none;
-  text-decoration: none;
-  color: var(--ink);
   animation: lotv-fade 1.6s ease 2.6s backwards;
 }
-body[data-page="home"] .kakao-float-btn {
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--paper);
-  background: color-mix(in srgb, var(--paper) 88%, transparent);
-  border: 1px solid rgba(0, 0, 0, 0.14);
-  border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
-  box-shadow: none;
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-  transition: border-color 0.5s ease;
-}
-body[data-page="home"] .kakao-float-btn svg { width: 16px; height: 16px; }
-body[data-page="home"] .kakao-float-btn svg path { fill: var(--ink); }
-
-body[data-page="home"] .kakao-float-label {
-  font-family: 'Noto Sans KR', sans-serif;
-  font-weight: 300;
-  font-size: 10.5px;
-  letter-spacing: 0.12em;
-  white-space: nowrap;
-  color: var(--accent);
-  background: none;
-  padding: 0;
-  box-shadow: none;
-  opacity: 0;
-  translate: 6px 0;
-  pointer-events: none;
-  transition: opacity 0.5s ease, translate 0.6s var(--ease-out, ease);
-}
-@media (hover: hover) {
-  body[data-page="home"] .kakao-float:hover .kakao-float-btn { border-color: var(--ink); }
-  body[data-page="home"] .kakao-float:hover .kakao-float-label { opacity: 1; translate: 0 0; }
-}
-body[data-page="home"] .kakao-float:focus-visible .kakao-float-label { opacity: 1; translate: 0 0; }
-@media (hover: none) {
-  body[data-page="home"] .kakao-float-label { display: none; }
-}
-
-/* 키보드 포커스 */
-body[data-page="home"] .brand:focus-visible,
-body[data-page="home"] .menu-toggle:focus-visible,
-body[data-page="home"] .kakao-float:focus-visible {
-  outline: 1px solid var(--ink);
-  outline-offset: 4px;
-}
-body[data-page="home"] .kakao-float:focus-visible { outline: none; }
-body[data-page="home"] .kakao-float:focus-visible .kakao-float-btn { border-color: var(--ink); }
-
 @keyframes lotv-fade { from { opacity: 0; } to { opacity: 1; } }
 
 /* ── 페이지 로드 연출: 천천히 드러나는 순서 ─────────────────────────────────
@@ -293,8 +169,7 @@ body[data-page="home"] .kakao-float:focus-visible .kakao-float-btn { border-colo
 
 /* ── 모바일: 축소가 아니라 세로 화면에 맞게 다시 짠 비율 ───────────────── */
 @media (max-width: 640px) {
-  :root { --m: 30px; --edge: 22px; }
-  body[data-page="home"] { --header-h: 64px; }
+  :root { --m: 30px; }
 
   .hero-inner { translate: 0 -2.4vh; }
   .hero-symbol { height: clamp(140px, 24vh, 196px); margin-bottom: 18px; }
@@ -303,7 +178,7 @@ body[data-page="home"] .kakao-float:focus-visible .kakao-float-btn { border-colo
   .hero-ko { margin-top: 9px; font-size: 9.5px; }
 
   .hero-foot {
-    right: calc(var(--edge) + 54px);
+    right: calc(var(--gutter) + 54px);
     flex-direction: column;
     align-items: flex-start;
     gap: 0;
@@ -312,10 +187,6 @@ body[data-page="home"] .kakao-float:focus-visible .kakao-float-btn { border-colo
     letter-spacing: 0.04em;
   }
   .hero-foot span { white-space: normal; }
-
-  body[data-page="home"] .brand { font-size: 14px; letter-spacing: 0.32em; }
-  body[data-page="home"] .kakao-float-btn { width: 38px; height: 38px; }
-  body[data-page="home"] .kakao-float-btn svg { width: 15px; height: 15px; }
 }
 
 /* 높이가 낮은 화면(가로 모드 휴대폰, 작은 노트북 창) */
@@ -324,19 +195,6 @@ body[data-page="home"] .kakao-float:focus-visible .kakao-float-btn { border-colo
   .hero-symbol { height: 24vh; margin-bottom: 10px; }
   .hero-rule { height: 18px; margin: 14px 0 10px; }
   .hero-inner { translate: 0 -1vh; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .js .hero-symbol,
-  .js .hero-mark,
-  .js .hero-mark span,
-  .js .hero-rule,
-  .js .hero-name,
-  .js .hero-ko,
-  .js .hero-foot { transition-duration: 0.01s !important; transition-delay: 0s !important; }
-  body[data-page="home"] .kakao-float { animation: none; }
-  body[data-page="home"] .menu-toggle span,
-  body[data-page="home"] .kakao-float-label { transition: none; }
 }
 </style>
 
