@@ -18,10 +18,27 @@
 
 <style>
 /* ==========================================================================
-   INDEX 전용 — 스크롤 없는 한 화면 (로고 + 햄버거)
+   INDEX 전용 — 스크롤 없는 한 화면
+   구성 원칙
+   · 중앙 축(심볼 → LOTV → 라인 → 영문명 → 한글명) = 브랜드 레이어
+   · 네 모서리(로고 / 햄버거 / 사업자 정보 / 카카오) = 기능 레이어
+     → 모두 같은 좌우 기준선(--edge)과 하단 기준선(--foot-y)에 정렬
    ========================================================================== */
+:root {
+  --edge:   clamp(22px, 3.2vw, 56px);                 /* 좌우 기준선 */
+  --foot-y: clamp(18px, 3.2vh, 34px);                 /* 하단 기준선 */
+  --m:      clamp(30px, min(3.7vw, 5.4vh), 52px);     /* LOTV 크기 = Hero 전체 비율의 기준 단위 */
+}
+body[data-page="home"] {
+  --header-h: clamp(64px, 8.4vh, 88px);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
 html, body { height: 100%; overflow: hidden; }
 
+/* ── HERO ───────────────────────────────────────────────────────────────── */
 .hero {
   position: relative;
   height: 100vh;
@@ -29,18 +46,24 @@ html, body { height: 100%; overflow: hidden; }
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--header-h) var(--gutter);
+  padding: var(--header-h) var(--edge);
   background: var(--paper);
   text-align: center;
 }
-.hero-inner { display: flex; flex-direction: column; align-items: center; }
+.hero-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* 시각적 중심을 기하학적 중심보다 살짝 위로 (지면 구성의 광학 중심) */
+  translate: 0 calc(var(--m) * -0.36);
+}
 
-/* 은방울꽃 심볼 (투명 PNG) */
+/* 은방울꽃 심볼 (투명 PNG) — 크기는 LOTV 기준 비율, 화면 높이로 상한 */
 .hero-symbol {
   display: block;
-  height: clamp(180px, 31vh, 290px);
+  height: min(calc(var(--m) * 4.8), 30vh);
   width: auto;
-  margin-bottom: clamp(18px, 3vh, 30px);
+  margin-bottom: calc(var(--m) * 0.56);
   /* 가운데 정렬 미세 조정: 음수 = 왼쪽, 양수 = 오른쪽 (예: -6px) */
   translate: var(--symbol-shift, 0px) 0;
   user-select: none;
@@ -50,10 +73,10 @@ html, body { height: 100%; overflow: hidden; }
 .hero-mark {
   font-family: var(--serif);
   font-weight: 500;
-  font-size: clamp(34px, 4vw, 58px);
+  font-size: var(--m);
   line-height: 1;
-  letter-spacing: 0.2em;
-  padding-left: 0.2em;           /* 자간 우측 여백 보정 → 시각적 중앙 정렬 */
+  letter-spacing: 0.22em;
+  padding-left: 0.22em;          /* 자간 우측 여백 보정 → 시각적 중앙 정렬 */
   color: var(--ink);
   display: flex;
 }
@@ -62,71 +85,258 @@ html, body { height: 100%; overflow: hidden; }
 .hero-rule {
   display: block;
   width: 1px;
-  height: clamp(26px, 4vh, 40px);
-  margin: clamp(22px, 3.6vh, 34px) 0 clamp(18px, 2.6vh, 24px);
+  height: calc(var(--m) * 0.82);
+  margin: calc(var(--m) * 0.74) 0 calc(var(--m) * 0.5);
   background: var(--ink);
+  opacity: 0.45;
   transform-origin: top;
 }
+
 .hero-name {
   font-family: var(--serif);
   font-style: italic;
   font-weight: 300;
-  font-size: clamp(15px, 1.2vw, 17px);
+  font-size: clamp(14px, calc(var(--m) * 0.33), 17px);
   line-height: 1.3;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.05em;
   color: var(--ink);
 }
 .hero-ko {
-  margin-top: 10px;
-  font-size: 10.5px;
-  letter-spacing: 0.28em;
-  padding-left: 0.28em;
+  margin-top: clamp(8px, calc(var(--m) * 0.22), 12px);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 300;
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 0.42em;
+  padding-left: 0.42em;
   color: var(--accent);
 }
 
-/* 하단: 사업자 정보만 아주 작게 */
+/* ── 하단 사업자 정보 — 기능 레이어 (좌하단 모서리) ─────────────────────── */
 .hero-foot {
   position: absolute;
-  left: var(--gutter);
-  right: var(--gutter);
-  bottom: clamp(20px, 3.5vh, 32px);
+  left: var(--edge);
+  right: calc(var(--edge) + 64px);            /* 카카오 버튼 자리 확보 */
+  bottom: calc(var(--foot-y) + env(safe-area-inset-bottom, 0px));
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   flex-wrap: wrap;
-  gap: 4px 20px;
-  font-size: 10.5px;
+  gap: 2px 28px;
+  font-family: 'Jost', 'Noto Sans KR', sans-serif;
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 1.6;
   letter-spacing: 0.06em;
+  text-align: left;
   color: var(--accent);
+  color: color-mix(in srgb, var(--accent) 72%, var(--paper));
+}
+.hero-foot span { white-space: nowrap; }
+
+/* ── HEADER — 구조 유지, 기준선·비율만 정리 ─────────────────────────────── */
+body[data-page="home"] .site-header {
+  height: var(--header-h);
+  padding-left: var(--edge);
+  padding-right: var(--edge);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+body[data-page="home"] .brand {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 1;
+  letter-spacing: 0.34em;
+  text-decoration: none;
 }
 
-/* 페이지 로드 연출: 글자가 넓은 자간에서 제자리로 모이며 나타남 */
+/* 햄버거: 긴 선 + 짧은 선, 우측 끝이 --edge 기준선에 정확히 맞도록 */
+body[data-page="home"] .menu-toggle {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  margin-right: -9px;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+body[data-page="home"] .menu-toggle span {
+  position: absolute;
+  right: 9px;
+  left: auto;
+  height: 1px;
+  margin: 0;
+  transform: none;
+  transition: top 0.35s var(--ease-out, ease) 0.15s,
+              width 0.35s var(--ease-out, ease),
+              transform 0.35s var(--ease-out, ease);
+}
+body[data-page="home"] .menu-toggle span:nth-child(1) { top: calc(50% - 4px); width: 26px; }
+body[data-page="home"] .menu-toggle span:nth-child(2) { top: calc(50% + 3px); width: 17px; }
+
+body[data-page="home"] .menu-toggle[aria-expanded="true"] span {
+  top: 50%;
+  width: 22px;
+  right: 11px;
+  transition: top 0.35s var(--ease-out, ease),
+              width 0.35s var(--ease-out, ease),
+              transform 0.35s var(--ease-out, ease) 0.15s;
+}
+body[data-page="home"] .menu-toggle[aria-expanded="true"] span:nth-child(1) { transform: rotate(45deg); }
+body[data-page="home"] .menu-toggle[aria-expanded="true"] span:nth-child(2) { transform: rotate(-45deg); }
+
+/* ── 카카오톡 — 우하단 모서리, 사업자 정보와 같은 하단 기준선 ─────────────── */
+body[data-page="home"] .kakao-float {
+  position: fixed;
+  right: var(--edge);
+  bottom: calc(var(--foot-y) + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 14px;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  text-decoration: none;
+  color: var(--ink);
+  animation: lotv-fade 1.6s ease 2.6s backwards;
+}
+body[data-page="home"] .kakao-float-btn {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--paper);
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+  box-shadow: none;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  transition: border-color 0.5s ease;
+}
+body[data-page="home"] .kakao-float-btn svg { width: 16px; height: 16px; }
+body[data-page="home"] .kakao-float-btn svg path { fill: var(--ink); }
+
+body[data-page="home"] .kakao-float-label {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 300;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+  color: var(--accent);
+  background: none;
+  padding: 0;
+  box-shadow: none;
+  opacity: 0;
+  translate: 6px 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease, translate 0.6s var(--ease-out, ease);
+}
+@media (hover: hover) {
+  body[data-page="home"] .kakao-float:hover .kakao-float-btn { border-color: var(--ink); }
+  body[data-page="home"] .kakao-float:hover .kakao-float-label { opacity: 1; translate: 0 0; }
+}
+body[data-page="home"] .kakao-float:focus-visible .kakao-float-label { opacity: 1; translate: 0 0; }
+@media (hover: none) {
+  body[data-page="home"] .kakao-float-label { display: none; }
+}
+
+/* 키보드 포커스 */
+body[data-page="home"] .brand:focus-visible,
+body[data-page="home"] .menu-toggle:focus-visible,
+body[data-page="home"] .kakao-float:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 4px;
+}
+body[data-page="home"] .kakao-float:focus-visible { outline: none; }
+body[data-page="home"] .kakao-float:focus-visible .kakao-float-btn { border-color: var(--ink); }
+
+@keyframes lotv-fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* ── 페이지 로드 연출: 천천히 드러나는 순서 ─────────────────────────────────
+   심볼 → LOTV(자간이 조용히 모임) → 라인 → 영문명 → 한글명 → 하단 정보
+   ────────────────────────────────────────────────────────────────────────── */
+.js .hero-symbol {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 2s ease 0.1s, transform 2.4s var(--ease-out) 0.1s;
+}
+.js .hero-mark {
+  letter-spacing: 0.3em;
+  padding-left: 0.3em;
+  transition: letter-spacing 2.6s var(--ease-out) 0.4s, padding-left 2.6s var(--ease-out) 0.4s;
+}
 .js .hero-mark span {
   opacity: 0;
-  transform: translateY(0.12em);
-  transition: opacity 1.4s ease, transform 1.6s var(--ease-out);
+  transform: translateY(0.06em);
+  transition: opacity 1.8s ease, transform 2s var(--ease-out);
 }
-.js .hero-mark { letter-spacing: 0.38em; padding-left: 0.38em; transition: letter-spacing 2.2s var(--ease-out), padding-left 2.2s var(--ease-out); }
-.js .hero-rule { transform: scaleY(0); transition: transform 1.1s var(--ease) 0.9s; }
-.js .hero-symbol { opacity: 0; transform: translateY(8px); transition: opacity 1.6s ease, transform 1.8s var(--ease-out); }
+.js .hero-rule { transform: scaleY(0); transition: transform 1.4s var(--ease) 1.25s; }
 .js .hero-name,
 .js .hero-ko,
-.js .hero-foot { opacity: 0; transition: opacity 1.2s ease; }
+.js .hero-foot { opacity: 0; transition: opacity 1.6s ease; }
 
 .is-ready .hero-symbol { opacity: 1; transform: none; }
-.is-ready .hero-mark { letter-spacing: 0.2em; padding-left: 0.2em; }
-.is-ready .hero-mark span { opacity: 1; transform: none; transition-delay: 0.35s; }
-.is-ready .hero-mark span:nth-child(2) { transition-delay: 0.45s; }
-.is-ready .hero-mark span:nth-child(3) { transition-delay: 0.55s; }
-.is-ready .hero-mark span:nth-child(4) { transition-delay: 0.65s; }
+.is-ready .hero-mark { letter-spacing: 0.22em; padding-left: 0.22em; }
+.is-ready .hero-mark span { opacity: 1; transform: none; transition-delay: 0.5s; }
+.is-ready .hero-mark span:nth-child(2) { transition-delay: 0.58s; }
+.is-ready .hero-mark span:nth-child(3) { transition-delay: 0.66s; }
+.is-ready .hero-mark span:nth-child(4) { transition-delay: 0.74s; }
 .is-ready .hero-rule { transform: scaleY(1); }
-.is-ready .hero-name { opacity: 1; transition-delay: 1.5s; }
-.is-ready .hero-ko   { opacity: 1; transition-delay: 1.7s; }
-.is-ready .hero-foot { opacity: 1; transition-delay: 2.0s; }
+.is-ready .hero-name { opacity: 1; transition-delay: 1.9s; }
+.is-ready .hero-ko   { opacity: 1; transition-delay: 2.15s; }
+.is-ready .hero-foot { opacity: 1; transition-delay: 2.5s; }
 
+/* ── 모바일: 축소가 아니라 세로 화면에 맞게 다시 짠 비율 ───────────────── */
 @media (max-width: 640px) {
-  .hero-mark { font-size: 32px; }
-  .hero-symbol { height: 200px; margin-bottom: 18px; }
-  .hero-foot { flex-direction: column; align-items: flex-start; gap: 2px; }
+  :root { --m: 30px; --edge: 22px; }
+  body[data-page="home"] { --header-h: 64px; }
+
+  .hero-inner { translate: 0 -2.4vh; }
+  .hero-symbol { height: clamp(140px, 24vh, 196px); margin-bottom: 18px; }
+  .hero-rule { height: 30px; margin: 24px 0 16px; }
+  .hero-name { font-size: 14px; }
+  .hero-ko { margin-top: 9px; font-size: 9.5px; }
+
+  .hero-foot {
+    right: calc(var(--edge) + 54px);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    font-size: 9.5px;
+    line-height: 1.7;
+    letter-spacing: 0.04em;
+  }
+  .hero-foot span { white-space: normal; }
+
+  body[data-page="home"] .brand { font-size: 14px; letter-spacing: 0.32em; }
+  body[data-page="home"] .kakao-float-btn { width: 38px; height: 38px; }
+  body[data-page="home"] .kakao-float-btn svg { width: 15px; height: 15px; }
+}
+
+/* 높이가 낮은 화면(가로 모드 휴대폰, 작은 노트북 창) */
+@media (max-height: 480px) {
+  :root { --m: 26px; }
+  .hero-symbol { height: 24vh; margin-bottom: 10px; }
+  .hero-rule { height: 18px; margin: 14px 0 10px; }
+  .hero-inner { translate: 0 -1vh; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js .hero-symbol,
+  .js .hero-mark,
+  .js .hero-mark span,
+  .js .hero-rule,
+  .js .hero-name,
+  .js .hero-ko,
+  .js .hero-foot { transition-duration: 0.01s !important; transition-delay: 0s !important; }
+  body[data-page="home"] .kakao-float { animation: none; }
+  body[data-page="home"] .menu-toggle span,
+  body[data-page="home"] .kakao-float-label { transition: none; }
 }
 </style>
 
