@@ -20,16 +20,23 @@
 .pkg-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  border-top: 1px solid var(--ink);
+  gap: clamp(16px, 2vw, 28px);
+  align-items: stretch;
 }
+/* 배경과 구분되는 흰색 카드 + 테두리 + 그림자 + 상단 포인트 라인 */
 .pkg-card {
-  padding: clamp(36px, 4vw, 56px) clamp(24px, 2.6vw, 40px) clamp(40px, 4vw, 56px);
-  border-bottom: 1px solid var(--line);
+  padding: clamp(32px, 3.4vw, 48px) clamp(24px, 2.6vw, 36px) clamp(36px, 3.6vw, 48px);
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.09);
+  border-top: 2px solid var(--accent);
+  box-shadow: 0 12px 32px rgba(40, 30, 20, 0.08), 0 2px 6px rgba(40, 30, 20, 0.04);
   scroll-margin-top: calc(var(--header-h) + 24px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-.pkg-card + .pkg-card { border-left: 1px solid var(--line); }
-.pkg-card:first-child { padding-left: 0; }
-.pkg-card:last-child  { padding-right: 0; }
+.pkg-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(40, 30, 20, 0.12), 0 2px 8px rgba(40, 30, 20, 0.05);
+}
 .pkg-tag {
   display: block;
   margin-bottom: 24px;
@@ -96,12 +103,13 @@
 
 @media (max-width: 900px) {
   .pkg-grid { grid-template-columns: 1fr; }
-  .pkg-card, .pkg-card:first-child, .pkg-card:last-child { padding-left: 0; padding-right: 0; }
-  .pkg-card + .pkg-card { border-left: 0; }
   .pkg-name { min-height: 0; }
 }
 @media (max-width: 480px) {
   .pkg-cta .btn { width: 100%; }
+}
+@media (hover: none) {
+  .pkg-card:hover { transform: none; }
 }
 </style>
 
