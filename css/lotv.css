@@ -11,13 +11,13 @@
 
 /* ── 데스크톱 화면 배율 ─────────────────────────────────────────────────────
    PC(1025px 이상)에서는 브라우저를 80%로 본 것과 같은 크기로 보이게 함.
-   · 배율을 바꾸려면 아래 --z 값 하나만 수정 (1 = 100%, 0.9 = 90%, 0.8 = 80%)
-   · zoom은 vw/vh 단위 값도 같이 줄이므로, 파일 안의 vw/vh는 / var(--z)로 보정해 둠
+   · 크기 값(px)에만 배율을 곱하고, 화면 비율 단위(vw/vh)는 그대로 둠 → 비율이 깨지지 않음
+   · 배율 변경은 --s 값 하나만 수정 (1 = 100%, 0.9 = 90%, 0.8 = 80%)
+   · 이 파일이 늦게 반영돼도 var(--s, 1) 기본값 덕분에 100% 크기로 보일 뿐 깨지지 않음
    ────────────────────────────────────────────────────────────────────────── */
-:root { --z: 1; }
+:root { --s: 1; }
 @media (min-width: 1025px) {
-  :root { --z: 0.8; }
-  html { zoom: var(--z); }
+  :root { --s: 0.8; }
 }
 
 /* ── TOKENS ── */
@@ -36,11 +36,11 @@
   --sans:  'Jost', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
   --title: 'Cormorant Garamond', 'Noto Sans KR', sans-serif;   /* 영문 세리프 + 한글 산세리프 */
 
-  --max:      1320px;
-  --gutter:   clamp(22px, calc(4vw / var(--z)), 64px);
-  --gap:      clamp(16px, calc(2vw / var(--z)), 32px);
-  --header-h: 80px;
-  --section:  clamp(120px, calc(15vw / var(--z)), 224px);
+  --max:      calc(1320px * var(--s, 1));
+  --gutter:   clamp(calc(22px * var(--s, 1)), 4vw, calc(64px * var(--s, 1)));
+  --gap:      clamp(calc(16px * var(--s, 1)), 2vw, calc(32px * var(--s, 1)));
+  --header-h: calc(80px * var(--s, 1));
+  --section:  clamp(calc(120px * var(--s, 1)), 15vw, calc(224px * var(--s, 1)));
 
   --ease:     cubic-bezier(0.7, 0, 0.2, 1);
   --ease-out: cubic-bezier(0.2, 0, 0, 1);
@@ -54,7 +54,7 @@ body {
   color: var(--ink);
   font-family: var(--sans);
   font-weight: 300;
-  font-size: 14px;
+  font-size: calc(14px * var(--s, 1));
   line-height: 1.95;
   letter-spacing: 0.02em;
   -webkit-font-smoothing: antialiased;
@@ -64,7 +64,7 @@ body {
 img { display: block; max-width: 100%; }
 a { color: inherit; }
 button { font: inherit; color: inherit; }
-:focus-visible { outline: 1px solid var(--ink); outline-offset: 4px; }
+:focus-visible { outline: 1px solid var(--ink); outline-offset: calc(4px * var(--s, 1)); }
 ::selection { background: var(--cream-dark); color: var(--ink); }
 
 .container {
@@ -93,13 +93,13 @@ button { font: inherit; color: inherit; }
 }
 .site-header.is-scrolled {
   background: rgba(251, 250, 247, 0.9);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(calc(12px * var(--s, 1)));
+  backdrop-filter: blur(calc(12px * var(--s, 1)));
   border-bottom-color: var(--line);
 }
 .brand {
   font-family: var(--serif);
-  font-size: 20px;
+  font-size: calc(20px * var(--s, 1));
   font-weight: 500;
   letter-spacing: 0.34em;
   line-height: 1;
@@ -112,15 +112,15 @@ button { font: inherit; color: inherit; }
 
 /* 햄버거: 긴 선 + 짧은 선. 선의 오른쪽 끝이 --gutter 기준선에 정확히 닿도록 보정 */
 .menu-toggle {
-  width: 44px;
-  height: 44px;
-  margin-right: -9px;
-  padding-right: 9px;
+  width: calc(44px * var(--s, 1));
+  height: calc(44px * var(--s, 1));
+  margin-right: calc(-9px * var(--s, 1));
+  padding-right: calc(9px * var(--s, 1));
   display: inline-flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-end;
-  gap: 7px;
+  gap: calc(7px * var(--s, 1));
   background: none;
   border: 0;
   cursor: pointer;
@@ -132,10 +132,10 @@ button { font: inherit; color: inherit; }
   background: currentColor;
   transition: transform 0.5s var(--ease), width 0.5s var(--ease);
 }
-.menu-toggle span:nth-child(1) { width: 26px; }
-.menu-toggle span:nth-child(2) { width: 16px; }
+.menu-toggle span:nth-child(1) { width: calc(26px * var(--s, 1)); }
+.menu-toggle span:nth-child(2) { width: calc(16px * var(--s, 1)); }
 @media (hover: hover) {
-  .menu-toggle:hover span:nth-child(2) { width: 26px; }
+  .menu-toggle:hover span:nth-child(2) { width: calc(26px * var(--s, 1)); }
 }
 
 /* 메뉴 열림 상태 */
@@ -146,8 +146,8 @@ body.menu-open .site-header {
   backdrop-filter: none;
 }
 body.menu-open .site-header .brand { opacity: 1; pointer-events: auto; }
-body.menu-open .menu-toggle span:nth-child(1) { width: 22px; transform: translateY(4px) rotate(45deg); }
-body.menu-open .menu-toggle span:nth-child(2) { width: 22px; transform: translateY(-4px) rotate(-45deg); }
+body.menu-open .menu-toggle span:nth-child(1) { width: calc(22px * var(--s, 1)); transform: translateY(calc(4px * var(--s, 1))) rotate(45deg); }
+body.menu-open .menu-toggle span:nth-child(2) { width: calc(22px * var(--s, 1)); transform: translateY(calc(-4px * var(--s, 1))) rotate(-45deg); }
 
 /* ── DRAWER (풀스크린 메뉴) ── */
 .drawer {
@@ -167,18 +167,18 @@ body.menu-open .menu-toggle span:nth-child(2) { width: 22px; transform: translat
 }
 .drawer-inner {
   min-height: 100%;
-  padding: calc(var(--header-h) + 32px) var(--gutter) calc(36px + env(safe-area-inset-bottom, 0px));
+  padding: calc(var(--header-h) + calc(32px * var(--s, 1))) var(--gutter) calc(calc(36px * var(--s, 1)) + env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 56px;
+  gap: calc(56px * var(--s, 1));
 }
-.drawer-nav { margin: auto 0 auto auto; width: min(100%, 400px); }
+.drawer-nav { margin: auto 0 auto auto; width: min(100%, calc(400px * var(--s, 1))); }
 .drawer-list { list-style: none; }
 .drawer-list li {
   border-bottom: 1px solid var(--line);
   opacity: 0;
-  transform: translateY(14px);
+  transform: translateY(calc(14px * var(--s, 1)));
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 .drawer.is-open .drawer-list li {
@@ -195,15 +195,15 @@ body.menu-open .menu-toggle span:nth-child(2) { width: 22px; transform: translat
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 24px;
-  padding: clamp(16px, calc(2.4vh / var(--z)), 22px) 0;
+  gap: calc(24px * var(--s, 1));
+  padding: clamp(calc(16px * var(--s, 1)), 2.4vh, calc(22px * var(--s, 1))) 0;
   text-decoration: none;
   color: var(--ink-soft);
 }
 .drawer-en {
   font-family: var(--serif);
   font-weight: 300;
-  font-size: clamp(20px, calc(1.7vw / var(--z)), 24px);
+  font-size: clamp(calc(20px * var(--s, 1)), 1.7vw, calc(24px * var(--s, 1)));
   line-height: 1;
   letter-spacing: 0.02em;
   transition: color 0.35s ease, transform 0.6s var(--ease-out);
@@ -211,22 +211,22 @@ body.menu-open .menu-toggle span:nth-child(2) { width: 22px; transform: translat
 .drawer-ko {
   display: inline-flex;
   align-items: center;
-  font-size: 10.5px;
+  font-size: calc(10.5px * var(--s, 1));
   letter-spacing: 0.18em;
   color: var(--accent);
   white-space: nowrap;
 }
 .drawer-link:hover .drawer-en,
-.drawer-link:focus-visible .drawer-en { color: var(--ink); transform: translateX(8px); }
+.drawer-link:focus-visible .drawer-en { color: var(--ink); transform: translateX(calc(8px * var(--s, 1))); }
 
 /* 현재 페이지 표시: 잉크 컬러 + 이탤릭 + 한글 라벨 앞 라인 */
 .drawer-link[aria-current="page"] .drawer-en { color: var(--ink); font-style: italic; }
 .drawer-link[aria-current="page"] .drawer-ko { color: var(--ink); }
 .drawer-link[aria-current="page"] .drawer-ko::before {
   content: '';
-  width: 20px;
+  width: calc(20px * var(--s, 1));
   height: 1px;
-  margin-right: 10px;
+  margin-right: calc(10px * var(--s, 1));
   background: var(--ink);
 }
 
@@ -234,7 +234,7 @@ body.menu-open .menu-toggle span:nth-child(2) { width: 22px; transform: translat
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  gap: 24px;
+  gap: calc(24px * var(--s, 1));
   flex-wrap: wrap;
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -243,41 +243,41 @@ body.menu-open .menu-toggle span:nth-child(2) { width: 22px; transform: translat
 .drawer-tagline {
   font-family: var(--serif);
   font-style: italic;
-  font-size: 15px;
+  font-size: calc(15px * var(--s, 1));
   color: var(--ink-soft);
 }
-.drawer-contact { display: flex; gap: 32px; flex-wrap: wrap; }
+.drawer-contact { display: flex; gap: calc(32px * var(--s, 1)); flex-wrap: wrap; }
 .drawer-contact a {
-  font-size: 12px;
+  font-size: calc(12px * var(--s, 1));
   letter-spacing: 0.06em;
   color: var(--ink-soft);
   text-decoration: none;
   transition: color 0.25s;
 }
 .drawer-contact a:hover { color: var(--ink); }
-.drawer-contact small { color: var(--accent); font-size: 11px; margin-right: 8px; }
+.drawer-contact small { color: var(--accent); font-size: calc(11px * var(--s, 1)); margin-right: calc(8px * var(--s, 1)); }
 
 /* ── 서브페이지 공통 머리 (About / Gallery / Package / Reserve) ──
    제목과 보조 문구를 한 줄 기준선에 놓아 지면처럼 보이게 함 */
 .page-head {
-  padding: calc(var(--header-h) + clamp(72px, calc(10vw / var(--z)), 152px)) 0 clamp(44px, calc(5.4vw / var(--z)), 80px);
+  padding: calc(var(--header-h) + clamp(calc(72px * var(--s, 1)), 10vw, calc(152px * var(--s, 1)))) 0 clamp(calc(44px * var(--s, 1)), 5.4vw, calc(80px * var(--s, 1)));
 }
 .page-head .container {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
-  gap: 14px 40px;
+  gap: calc(14px * var(--s, 1)) calc(40px * var(--s, 1));
 }
 .page-title {
   font-family: var(--title);
   font-weight: 300;
-  font-size: clamp(30px, calc(3.4vw / var(--z)), 50px);
+  font-size: clamp(calc(30px * var(--s, 1)), 3.4vw, calc(50px * var(--s, 1)));
   letter-spacing: 0.02em;
   line-height: 1.05;
 }
 .page-sub {
-  font-size: 11.5px;
+  font-size: calc(11.5px * var(--s, 1));
   line-height: 1.6;
   letter-spacing: 0.08em;
   color: var(--accent);
@@ -287,7 +287,7 @@ body.menu-open .menu-toggle span:nth-child(2) { width: 22px; transform: translat
 .section-title {
   font-family: var(--serif);
   font-weight: 300;
-  font-size: clamp(26px, calc(2.4vw / var(--z)), 34px);
+  font-size: clamp(calc(26px * var(--s, 1)), 2.4vw, calc(34px * var(--s, 1)));
   line-height: 1.1;
   letter-spacing: 0.04em;
 }
@@ -296,8 +296,8 @@ body.menu-open .menu-toggle span:nth-child(2) { width: 22px; transform: translat
 .text-link {
   position: relative;
   display: inline-block;
-  padding-bottom: 5px;
-  font-size: 12px;
+  padding-bottom: calc(5px * var(--s, 1));
+  font-size: calc(12px * var(--s, 1));
   letter-spacing: 0.12em;
   color: var(--ink);
   text-decoration: none;
@@ -317,13 +317,13 @@ body.menu-open .menu-toggle span:nth-child(2) { width: 22px; transform: translat
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 46px;
-  padding: 0 30px;
+  min-height: calc(46px * var(--s, 1));
+  padding: 0 calc(30px * var(--s, 1));
   border: 1px solid var(--ink);
   background: transparent;
   color: var(--ink);
   font-family: var(--sans);
-  font-size: 11.5px;
+  font-size: calc(11.5px * var(--s, 1));
   font-weight: 400;
   letter-spacing: 0.16em;
   text-decoration: none;
@@ -346,29 +346,29 @@ body.menu-open .menu-toggle span:nth-child(2) { width: 22px; transform: translat
 .site-footer {
   background: var(--paper);
   border-top: 1px solid var(--line);
-  padding: clamp(80px, calc(10vw / var(--z)), 136px) 0 calc(36px + env(safe-area-inset-bottom, 0px));
+  padding: clamp(calc(80px * var(--s, 1)), 10vw, calc(136px * var(--s, 1))) 0 calc(calc(36px * var(--s, 1)) + env(safe-area-inset-bottom, 0px));
 }
 .footer-top {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   gap: var(--gap);
-  padding-bottom: clamp(64px, calc(8vw / var(--z)), 112px);
+  padding-bottom: clamp(calc(64px * var(--s, 1)), 8vw, calc(112px * var(--s, 1)));
 }
 .footer-brand-block { grid-column: 1 / span 5; }
 .footer-brand {
   font-family: var(--serif);
   font-weight: 400;
-  font-size: 20px;
+  font-size: calc(20px * var(--s, 1));
   letter-spacing: 0.34em;
   line-height: 1;
   text-decoration: none;
   color: var(--ink);
 }
 .footer-tagline {
-  margin-top: 18px;
+  margin-top: calc(18px * var(--s, 1));
   font-family: var(--serif);
   font-style: italic;
-  font-size: 14px;
+  font-size: calc(14px * var(--s, 1));
   line-height: 1.6;
   color: var(--ink-soft);
 }
@@ -376,14 +376,14 @@ body.menu-open .menu-toggle span:nth-child(2) { width: 22px; transform: translat
 .footer-col--menu    { grid-column: 10 / span 3; }
 .footer-label {
   display: block;
-  margin-bottom: 12px;
-  font-size: 10.5px;
+  margin-bottom: calc(12px * var(--s, 1));
+  font-size: calc(10.5px * var(--s, 1));
   letter-spacing: 0.12em;
   color: var(--accent);
 }
 .footer-col ul { list-style: none; }
 .footer-col a {
-  font-size: 12px;
+  font-size: calc(12px * var(--s, 1));
   line-height: 2.2;
   color: var(--ink-soft);
   text-decoration: none;
@@ -394,56 +394,56 @@ body.menu-open .menu-toggle span:nth-child(2) { width: 22px; transform: translat
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  gap: 6px 32px;
+  gap: calc(6px * var(--s, 1)) calc(32px * var(--s, 1));
   flex-wrap: wrap;
-  padding-top: 24px;
-  padding-right: 64px;                 /* 카카오 버튼과 겹치지 않도록 */
+  padding-top: calc(24px * var(--s, 1));
+  padding-right: calc(64px * var(--s, 1));                 /* 카카오 버튼과 겹치지 않도록 */
   border-top: 1px solid var(--line);
-  font-size: 10.5px;
+  font-size: calc(10.5px * var(--s, 1));
   line-height: 1.7;
   letter-spacing: 0.05em;
   color: var(--accent);
 }
-.footer-bottom p:first-child { display: flex; flex-wrap: wrap; gap: 2px 24px; }
+.footer-bottom p:first-child { display: flex; flex-wrap: wrap; gap: 2px calc(24px * var(--s, 1)); }
 .footer-copy { color: var(--accent); }
 
 /* ── KAKAO FLOATING ── 작고 조용한 원형 버튼, 우측 기준선에 정렬 */
 .kakao-float {
   position: fixed;
   right: var(--gutter);
-  bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(calc(28px * var(--s, 1)) + env(safe-area-inset-bottom, 0px));
   z-index: 999;
   display: flex;
   flex-direction: row-reverse;
   align-items: center;
-  gap: 14px;
+  gap: calc(14px * var(--s, 1));
   text-decoration: none;
   color: var(--ink);
   transition: opacity 0.4s ease;
 }
 .kakao-float-btn {
-  width: 40px;
-  height: 40px;
+  width: calc(40px * var(--s, 1));
+  height: calc(40px * var(--s, 1));
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(251, 250, 247, 0.88);
   border: 1px solid rgba(28, 26, 23, 0.16);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(calc(6px * var(--s, 1)));
+  backdrop-filter: blur(calc(6px * var(--s, 1)));
   transition: border-color 0.5s ease, background 0.5s ease;
 }
-.kakao-float-btn svg { width: 16px; height: 16px; }
+.kakao-float-btn svg { width: calc(16px * var(--s, 1)); height: calc(16px * var(--s, 1)); }
 .kakao-float-btn svg path { fill: var(--ink); }
 .kakao-float-label {
-  font-size: 10.5px;
+  font-size: calc(10.5px * var(--s, 1));
   line-height: 1.5;
   letter-spacing: 0.12em;
   white-space: nowrap;
   color: var(--accent);
   opacity: 0;
-  translate: 6px 0;
+  translate: calc(6px * var(--s, 1)) 0;
   pointer-events: none;
   transition: opacity 0.5s ease, translate 0.6s var(--ease-out);
 }
@@ -464,23 +464,23 @@ body:has(.lightbox.open) .kakao-float { opacity: 0; pointer-events: none; }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 900px) {
-  .footer-brand-block { grid-column: 1 / -1; margin-bottom: 24px; }
+  .footer-brand-block { grid-column: 1 / -1; margin-bottom: calc(24px * var(--s, 1)); }
   .footer-col--contact, .footer-col--menu { grid-column: span 6; }
 }
 @media (max-width: 640px) {
-  :root { --header-h: 64px; }
-  body { font-size: 13.5px; }
-  .brand { font-size: 14px; letter-spacing: 0.32em; }
-  .drawer-en { font-size: 20px; }
-  .drawer-link { flex-direction: column; gap: 10px; }
+  :root { --header-h: calc(64px * var(--s, 1)); }
+  body { font-size: calc(13.5px * var(--s, 1)); }
+  .brand { font-size: calc(14px * var(--s, 1)); letter-spacing: 0.32em; }
+  .drawer-en { font-size: calc(20px * var(--s, 1)); }
+  .drawer-link { flex-direction: column; gap: calc(10px * var(--s, 1)); }
   .drawer-foot { flex-direction: column; align-items: flex-start; }
-  .drawer-contact { flex-direction: column; gap: 10px; }
-  .page-head .container { flex-direction: column; align-items: flex-start; gap: 12px; }
-  .footer-bottom { flex-direction: column; gap: 2px; padding-right: 56px; }
+  .drawer-contact { flex-direction: column; gap: calc(10px * var(--s, 1)); }
+  .page-head .container { flex-direction: column; align-items: flex-start; gap: calc(12px * var(--s, 1)); }
+  .footer-bottom { flex-direction: column; gap: 2px; padding-right: calc(56px * var(--s, 1)); }
   .footer-bottom p:first-child { flex-direction: column; gap: 2px; }
-  .kakao-float { bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }
-  .kakao-float-btn { width: 38px; height: 38px; }
-  .kakao-float-btn svg { width: 15px; height: 15px; }
+  .kakao-float { bottom: calc(calc(20px * var(--s, 1)) + env(safe-area-inset-bottom, 0px)); }
+  .kakao-float-btn { width: calc(38px * var(--s, 1)); height: calc(38px * var(--s, 1)); }
+  .kakao-float-btn svg { width: calc(15px * var(--s, 1)); height: calc(15px * var(--s, 1)); }
 }
 
 @media (prefers-reduced-motion: reduce) {
