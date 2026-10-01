@@ -14,7 +14,176 @@
 <script>document.documentElement.classList.add('js');</script>
 
 <style>
-/* 서브페이지 공통 머리(.page-head)와 문서형 섹션(.doc-*)은 css/lotv.css */
+/* 문서형 섹션(.doc-*) — 공통 CSS가 늦게 반영돼도 이 페이지 레이아웃이 깨지지 않도록 페이지 안에도 포함 */
+/* ── 문서형 섹션 (Camera / Policy) ──
+   About과 같은 감성: 얇은 세리프 제목 + 작은 한글 라벨, 넉넉한 여백, 얇은 선
+   · 왼쪽 제목은 스크롤 중 살짝 따라오며(PC), 오른쪽 본문은 읽기 좋은 폭으로 좁힘 */
+.doc { padding-bottom: var(--section); }
+.doc-lead,
+.doc-row,
+.doc-outro {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 0 var(--gap);
+}
+
+/* 머리말 (Policy 첫 문단) */
+.doc-lead { padding-bottom: clamp(calc(56px * var(--s, 1)), 6vw, calc(96px * var(--s, 1))); }
+.doc-lead .doc-text {
+  grid-column: 6 / span 6;
+  font-size: calc(17px * var(--s, 1));
+  line-height: 2;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+
+/* 섹션 */
+.doc-row {
+  padding: clamp(calc(56px * var(--s, 1)), 6.4vw, calc(104px * var(--s, 1))) 0;
+  border-top: 1px solid var(--line);
+}
+.doc-lead + .doc-row,
+.doc > .container > .doc-row:first-child { border-top-color: var(--ink); }
+
+.doc-label {
+  grid-column: 1 / span 4;
+  align-self: start;
+  position: sticky;
+  top: calc(var(--header-h) + calc(40px * var(--s, 1)));
+}
+.doc-label h2 {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: clamp(calc(30px * var(--s, 1)), 2.8vw, calc(40px * var(--s, 1)));
+  line-height: 1.08;
+  letter-spacing: 0.005em;
+  color: var(--ink);
+}
+.doc-label small {
+  display: flex;
+  align-items: center;
+  margin-top: calc(18px * var(--s, 1));
+  font-size: calc(12px * var(--s, 1));
+  letter-spacing: 0.2em;
+  color: var(--accent);
+}
+.doc-label small::before {
+  content: '';
+  width: calc(18px * var(--s, 1));
+  height: 1px;
+  margin-right: calc(12px * var(--s, 1));
+  background: var(--accent);
+  opacity: 0.7;
+}
+
+.doc-body {
+  grid-column: 6 / span 6;
+  font-size: calc(15px * var(--s, 1));
+  line-height: 2.15;
+  letter-spacing: 0.01em;
+  color: var(--ink-soft);
+}
+/* 각 섹션의 첫 문단은 머리글처럼 조금 크고 진하게 */
+.doc-body > p:first-child {
+  font-size: calc(17px * var(--s, 1));
+  line-height: 2;
+  color: var(--ink);
+}
+.doc-body > * + * { margin-top: 1.5em; }
+.doc-body strong { font-weight: 400; color: var(--ink); }
+
+/* 항목 목록: Reservation 목록과 같은 얇은 선 */
+.doc-list {
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+.doc-list li {
+  padding: calc(13px * var(--s, 1)) 0;
+  border-bottom: 1px solid var(--line);
+  font-size: calc(14.5px * var(--s, 1));
+  line-height: 1.8;
+  letter-spacing: 0.03em;
+  color: var(--ink);
+}
+.doc-list .doc-sub {
+  display: block;
+  margin-top: 2px;
+  font-size: calc(13px * var(--s, 1));
+  letter-spacing: 0.02em;
+  color: var(--accent);
+}
+
+/* 번호 목록 (Notice): 세리프 이탤릭 번호 */
+.doc-steps {
+  list-style: none;
+  counter-reset: doc;
+  display: flex;
+  flex-direction: column;
+  gap: calc(28px * var(--s, 1));
+}
+.doc-body > .doc-steps:first-child { margin-top: 0; }
+.doc-steps li {
+  position: relative;
+  padding-left: calc(52px * var(--s, 1));
+  counter-increment: doc;
+}
+.doc-steps li::before {
+  content: counter(doc, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: -0.1em;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: calc(22px * var(--s, 1));
+  line-height: 1.5;
+  color: var(--accent);
+}
+
+/* 별표 주석: 왼쪽 얇은 선과 함께 한 단계 작게 */
+.doc-notes {
+  list-style: none;
+  padding-left: calc(18px * var(--s, 1));
+  border-left: 1px solid var(--accent);
+  font-size: calc(13.5px * var(--s, 1));
+  line-height: 2;
+  color: var(--ink-soft);
+}
+
+/* 맺음말: 가운데 정렬 + 브랜드 서명 */
+.doc-outro {
+  padding-top: clamp(calc(72px * var(--s, 1)), 8vw, calc(128px * var(--s, 1)));
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+.doc-outro > * { grid-column: 1 / -1; }
+.doc-outro-text {
+  font-size: calc(17px * var(--s, 1));
+  line-height: 2.1;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+.doc-sign {
+  margin-top: calc(28px * var(--s, 1));
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: calc(19px * var(--s, 1));
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .doc-label { position: static; grid-column: 1 / -1; margin-bottom: calc(28px * var(--s, 1)); }
+  .doc-body, .doc-lead .doc-text { grid-column: 1 / -1; }
+}
+@media (max-width: 640px) {
+  .doc-label h2 { font-size: calc(30px * var(--s, 1)); }
+  .doc-body > p:first-child, .doc-lead .doc-text, .doc-outro-text { font-size: calc(16px * var(--s, 1)); }
+  .doc-steps li { padding-left: calc(40px * var(--s, 1)); }
+  /* 좁은 화면: 본문 줄바꿈은 화면 폭에 맡겨 어색한 한 단어 줄을 없앰 */
+  .doc-body br { display: none; }
+}
 </style>
 
 <script data-goatcounter="https://lotv.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
