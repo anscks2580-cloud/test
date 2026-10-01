@@ -99,7 +99,7 @@ button { font: inherit; color: inherit; }
 }
 .brand {
   font-family: var(--serif);
-  font-size: calc(20px * var(--s, 1));
+  font-size: calc(22px * var(--s, 1));
   font-weight: 500;
   letter-spacing: 0.34em;
   line-height: 1;
@@ -470,7 +470,7 @@ body:has(.lightbox.open) .kakao-float { opacity: 0; pointer-events: none; }
 @media (max-width: 640px) {
   :root { --header-h: calc(64px * var(--s, 1)); }
   body { font-size: calc(13.5px * var(--s, 1)); }
-  .brand { font-size: calc(14px * var(--s, 1)); letter-spacing: 0.32em; }
+  .brand { font-size: calc(16px * var(--s, 1)); letter-spacing: 0.32em; }
   .drawer-en { font-size: calc(20px * var(--s, 1)); }
   .drawer-link { flex-direction: column; gap: calc(10px * var(--s, 1)); }
   .drawer-foot { flex-direction: column; align-items: flex-start; }
