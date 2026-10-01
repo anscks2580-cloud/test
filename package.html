@@ -40,14 +40,14 @@
 .pkg-tag {
   display: block;
   margin-bottom: 24px;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.2em;
   color: var(--accent);
 }
 .pkg-name {
   font-family: var(--serif);
   font-weight: 300;
-  font-size: clamp(21px, 1.8vw, 26px);
+  font-size: clamp(23px, 2vw, 28px);
   line-height: 1.25;
   letter-spacing: 0.01em;
   min-height: 2.5em;
@@ -55,14 +55,14 @@
 .pkg-price {
   margin-top: 22px;
   font-family: var(--title);
-  font-size: clamp(19px, 1.5vw, 22px);
+  font-size: clamp(21px, 1.7vw, 24px);
   font-weight: 400;
   letter-spacing: 0.03em;
   line-height: 1.3;
 }
 .pkg-price-note {
   margin-top: 4px;
-  font-size: 10.5px;
+  font-size: 12.5px;
   letter-spacing: 0.08em;
   color: var(--accent);
 }
@@ -71,7 +71,7 @@
 .pkg-features li {
   position: relative;
   padding-left: 16px;
-  font-size: 12.5px;
+  font-size: 14.5px;
   line-height: 1.75;
   color: var(--ink-soft);
 }
@@ -86,7 +86,7 @@
 }
 .pkg-option-label {
   margin-top: 40px;
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.08em;
   color: var(--ink);
 }
@@ -94,12 +94,15 @@
 
 .pkg-note {
   margin-top: 44px;
-  font-size: 11.5px;
+  font-size: 13.5px;
   line-height: 2;
   letter-spacing: 0.02em;
   color: var(--ink-soft);
 }
 .pkg-cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 44px; }
+.pkg-cta .btn { font-size: 13.5px; }
+/* 이 페이지 머리 보조 문구(VAT 안내)도 +2 */
+body[data-page="package"] .page-sub { font-size: 13.5px; }
 
 @media (max-width: 900px) {
   .pkg-grid { grid-template-columns: 1fr; }
@@ -141,7 +144,7 @@
       <p class="drawer-tagline">Lily of the Valley Snap</p>
       <div class="drawer-contact">
         <a href="https://instagram.com/lotv.snap" target="_blank" rel="noopener"><small>Instagram</small>@lotv.snap</a>
-        <a href="https://pf.kakao.com/_xdLaxjX" target="_blank" rel="noopener"><small>KakaoTalk</small>채널 LOTV</a>
+        <a href="https://pf.kakao.com/_xdLaxjX" target="_blank" rel="noopener"><small>KakaoTalk</small>LOTV 로토브</a>
       </div>
     </div>
   </div>
@@ -230,7 +233,7 @@
       </div>
 
       <p class="pkg-note">
-        * 정확한 일정 확인 및 예약은 카카오톡 채널 LOTV로 문의해 주세요.<br>
+        * 정확한 일정 확인 및 예약은 카카오톡 LOTV 로토브로 문의해 주세요.<br>
         * 날짜·웨딩홀 정보를 함께 보내주시면 더 빠른 확인이 가능합니다.
       </p>
 
@@ -254,7 +257,7 @@
         <span class="footer-label">Contact</span>
         <ul>
           <li><a href="https://instagram.com/lotv.snap" target="_blank" rel="noopener">Instagram @lotv.snap</a></li>
-          <li><a href="https://pf.kakao.com/_xdLaxjX" target="_blank" rel="noopener">카카오톡 채널 LOTV</a></li>
+          <li><a href="https://pf.kakao.com/_xdLaxjX" target="_blank" rel="noopener">카카오톡 LOTV 로토브</a></li>
         </ul>
       </div>
       <nav class="footer-col footer-col--menu" aria-label="하단 메뉴">

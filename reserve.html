@@ -17,17 +17,18 @@
 /* 서브페이지 공통 머리(.page-head / .page-title / .page-sub)는 css/lotv.css */
 
 .reserve { padding-bottom: var(--section); }
+/* 좌우 분리 대신 왼쪽 한 줄로 이어지게: 예약 안내 → 환불 규정 */
 .reserve-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: var(--gap);
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
-.reserve-main { grid-column: 1 / span 6; }
-.reserve-side { grid-column: 8 / span 5; }
+.reserve-main,
+.reserve-side { width: 100%; max-width: 640px; }
+.reserve-side { margin-top: clamp(72px, 8vw, 112px); }
 
 .reserve-sub {
-  font-size: 13px;
+  font-size: 15px;
   line-height: 2.15;
   color: var(--ink-soft);
 }
@@ -40,11 +41,11 @@
 .reserve-list li {
   padding: 15px 0;
   border-bottom: 1px solid var(--line);
-  font-size: 12.5px;
+  font-size: 14.5px;
   letter-spacing: 0.04em;
   color: var(--ink);
 }
-.reserve-main .btn { margin-top: 44px; }
+.reserve-main .btn { margin-top: 44px; font-size: 13.5px; }
 
 /* 환불 규정: 박스 대신 상단 라인 하나로 구분 */
 .policy-box {
@@ -52,22 +53,18 @@
   border-top: 1px solid var(--ink);
 }
 .policy-label {
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.12em;
   color: var(--accent);
   margin-bottom: 16px;
 }
 .policy-notice {
-  font-size: 12.5px;
+  font-size: 14.5px;
   line-height: 2.05;
   color: var(--ink-soft);
 }
-.policy-box .btn { margin-top: 28px; min-height: 42px; padding: 0 24px; font-size: 11px; }
+.policy-box .btn { margin-top: 28px; min-height: 46px; padding: 0 28px; font-size: 13px; }
 
-@media (max-width: 900px) {
-  .reserve-main, .reserve-side { grid-column: 1 / -1; }
-  .reserve-side { order: -1; margin-bottom: 56px; }
-}
 @media (max-width: 480px) {
   .reserve-main .btn, .policy-box .btn { width: 100%; }
 }
@@ -101,7 +98,7 @@
       <p class="drawer-tagline">Lily of the Valley Snap</p>
       <div class="drawer-contact">
         <a href="https://instagram.com/lotv.snap" target="_blank" rel="noopener"><small>Instagram</small>@lotv.snap</a>
-        <a href="https://pf.kakao.com/_xdLaxjX" target="_blank" rel="noopener"><small>KakaoTalk</small>채널 LOTV</a>
+        <a href="https://pf.kakao.com/_xdLaxjX" target="_blank" rel="noopener"><small>KakaoTalk</small>LOTV 로토브</a>
       </div>
     </div>
   </div>
@@ -120,7 +117,7 @@
       <div class="reserve-main">
         <p class="reserve-sub" id="reserve-title">
           함께할 소중한 날을 위해<br>
-          아래 정보를 카카오톡 채널 <strong>LOTV</strong>로 보내주세요.
+          아래 정보를 카카오톡 <strong>LOTV 로토브</strong>로 보내주세요.
         </p>
         <ul class="reserve-list">
           <li>성함</li>
@@ -157,7 +154,7 @@
         <span class="footer-label">Contact</span>
         <ul>
           <li><a href="https://instagram.com/lotv.snap" target="_blank" rel="noopener">Instagram @lotv.snap</a></li>
-          <li><a href="https://pf.kakao.com/_xdLaxjX" target="_blank" rel="noopener">카카오톡 채널 LOTV</a></li>
+          <li><a href="https://pf.kakao.com/_xdLaxjX" target="_blank" rel="noopener">카카오톡 LOTV 로토브</a></li>
         </ul>
       </div>
       <nav class="footer-col footer-col--menu" aria-label="하단 메뉴">
