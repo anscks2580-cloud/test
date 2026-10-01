@@ -25,7 +25,7 @@
 }
 .reserve-main,
 .reserve-side { width: 100%; max-width: 640px; }
-.reserve-side { margin-top: clamp(72px, 8vw, 112px); }
+.reserve-side { margin-top: clamp(72px, calc(8vw / var(--z)), 112px); }
 
 .reserve-sub {
   font-size: 15px;
@@ -49,7 +49,7 @@
 
 /* 환불 규정: 박스 대신 상단 라인 하나로 구분 */
 .policy-box {
-  padding: clamp(24px, 2.6vw, 32px) 0 0;
+  padding: clamp(24px, calc(2.6vw / var(--z)), 32px) 0 0;
   border-top: 1px solid var(--ink);
 }
 .policy-label {

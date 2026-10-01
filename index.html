@@ -25,8 +25,8 @@
    헤더·햄버거·카카오 기본 스타일은 css/lotv.css 공통
    ========================================================================== */
 :root {
-  --foot-y: clamp(18px, 3.2vh, 34px);                 /* 하단 기준선 */
-  --m:      clamp(30px, min(3.7vw, 5.4vh), 52px);     /* LOTV 크기 = Hero 전체 비율의 기준 단위 */
+  --foot-y: clamp(18px, calc(3.2vh / var(--z)), 34px);                 /* 하단 기준선 */
+  --m:      clamp(30px, min(calc(3.7vw / var(--z)), calc(5.4vh / var(--z))), 52px);     /* LOTV 크기 = Hero 전체 비율의 기준 단위 */
 }
 
 html, body { height: 100%; overflow: hidden; }
@@ -34,8 +34,8 @@ html, body { height: 100%; overflow: hidden; }
 /* ── HERO ───────────────────────────────────────────────────────────────── */
 .hero {
   position: relative;
-  height: 100vh;
-  height: 100svh;
+  height: calc(100vh / var(--z));
+  height: calc(100svh / var(--z));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -54,7 +54,7 @@ html, body { height: 100%; overflow: hidden; }
 /* 은방울꽃 심볼 (투명 PNG) — 크기는 LOTV 기준 비율, 화면 높이로 상한 */
 .hero-symbol {
   display: block;
-  height: min(calc(var(--m) * 4.8), 30vh);
+  height: min(calc(var(--m) * 4.8), calc(30vh / var(--z)));
   width: auto;
   margin-bottom: calc(var(--m) * 0.56);
   /* 가운데 정렬 미세 조정: 음수 = 왼쪽, 양수 = 오른쪽 (예: -6px) */
@@ -171,8 +171,8 @@ body[data-page="home"] .kakao-float {
 @media (max-width: 640px) {
   :root { --m: 30px; }
 
-  .hero-inner { translate: 0 -2.4vh; }
-  .hero-symbol { height: clamp(140px, 24vh, 196px); margin-bottom: 18px; }
+  .hero-inner { translate: 0 calc(-2.4vh / var(--z)); }
+  .hero-symbol { height: clamp(140px, calc(24vh / var(--z)), 196px); margin-bottom: 18px; }
   .hero-rule { height: 30px; margin: 24px 0 16px; }
   .hero-name { font-size: 14px; }
   .hero-ko { margin-top: 9px; font-size: 9.5px; }
@@ -192,9 +192,9 @@ body[data-page="home"] .kakao-float {
 /* 높이가 낮은 화면(가로 모드 휴대폰, 작은 노트북 창) */
 @media (max-height: 480px) {
   :root { --m: 26px; }
-  .hero-symbol { height: 24vh; margin-bottom: 10px; }
+  .hero-symbol { height: calc(24vh / var(--z)); margin-bottom: 10px; }
   .hero-rule { height: 18px; margin: 14px 0 10px; }
-  .hero-inner { translate: 0 -1vh; }
+  .hero-inner { translate: 0 calc(-1vh / var(--z)); }
 }
 </style>
 

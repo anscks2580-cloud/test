@@ -25,7 +25,7 @@
 .gallery-tabs {
   display: flex;
   gap: 4px;
-  margin-bottom: clamp(40px, 5vw, 64px);
+  margin-bottom: clamp(40px, calc(5vw / var(--z)), 64px);
   border-bottom: 1px solid var(--line);
   overflow-x: auto;
   scrollbar-width: none;
@@ -57,7 +57,7 @@
 .gallery-thumb-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: clamp(32px, 3.4vw, 56px) var(--gap);
+  gap: clamp(32px, calc(3.4vw / var(--z)), 56px) var(--gap);
 }
 .gallery-card {
   display: flex;
