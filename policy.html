@@ -184,6 +184,23 @@
   /* 좁은 화면: 본문 줄바꿈은 화면 폭에 맡겨 어색한 한 단어 줄을 없앰 */
   .doc-body br { display: none; }
 }
+
+/* 선 없는 목록 (Policy · Refund) */
+.doc-list--plain { border-top: 0; }
+.doc-list--plain li {
+  position: relative;
+  padding: calc(3px * var(--s, 1)) 0 calc(3px * var(--s, 1)) calc(18px * var(--s, 1));
+  border-bottom: 0;
+}
+.doc-list--plain li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 1.1em;
+  width: calc(7px * var(--s, 1));
+  height: 1px;
+  background: var(--accent);
+}
 </style>
 
 <script data-goatcounter="https://lotv.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
@@ -263,7 +280,7 @@
       <div class="doc-row">
         <div class="doc-label"><h2>Refund</h2><small>환불 규정</small></div>
         <div class="doc-body">
-          <ul class="doc-list">
+          <ul class="doc-list doc-list--plain">
             <li>계약은 계약금 10만 원 입금 후 확정됩니다.</li>
             <li>잔금은 예약일 7일 전 안내드립니다.</li>
           </ul>
