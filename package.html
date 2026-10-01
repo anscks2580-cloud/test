@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&family=Noto+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/lotv.css">
+<link rel="stylesheet" href="css/lotv.css?v=5">
 <script>document.documentElement.classList.add('js');</script>
 
 <style>
@@ -20,58 +20,58 @@
 .pkg-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: clamp(16px, calc(2vw / var(--z)), 28px);
+  gap: clamp(calc(16px * var(--s, 1)), 2vw, calc(28px * var(--s, 1)));
   align-items: stretch;
 }
 /* 배경과 구분되는 흰색 카드 + 테두리 + 그림자 + 상단 포인트 라인 */
 .pkg-card {
-  padding: clamp(32px, calc(3.4vw / var(--z)), 48px) clamp(24px, calc(2.6vw / var(--z)), 36px) clamp(36px, calc(3.6vw / var(--z)), 48px);
+  padding: clamp(calc(32px * var(--s, 1)), 3.4vw, calc(48px * var(--s, 1))) clamp(calc(24px * var(--s, 1)), 2.6vw, calc(36px * var(--s, 1))) clamp(calc(36px * var(--s, 1)), 3.6vw, calc(48px * var(--s, 1)));
   background: #fff;
   border: 1px solid rgba(0, 0, 0, 0.09);
   border-top: 2px solid var(--accent);
-  box-shadow: 0 12px 32px rgba(40, 30, 20, 0.08), 0 2px 6px rgba(40, 30, 20, 0.04);
-  scroll-margin-top: calc(var(--header-h) + 24px);
+  box-shadow: 0 calc(12px * var(--s, 1)) calc(32px * var(--s, 1)) rgba(40, 30, 20, 0.08), 0 2px calc(6px * var(--s, 1)) rgba(40, 30, 20, 0.04);
+  scroll-margin-top: calc(var(--header-h) + calc(24px * var(--s, 1)));
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 .pkg-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 18px 40px rgba(40, 30, 20, 0.12), 0 2px 8px rgba(40, 30, 20, 0.05);
+  transform: translateY(calc(-4px * var(--s, 1)));
+  box-shadow: 0 calc(18px * var(--s, 1)) calc(40px * var(--s, 1)) rgba(40, 30, 20, 0.12), 0 2px calc(8px * var(--s, 1)) rgba(40, 30, 20, 0.05);
 }
 .pkg-tag {
   display: block;
-  margin-bottom: 24px;
-  font-size: 12px;
+  margin-bottom: calc(24px * var(--s, 1));
+  font-size: calc(12px * var(--s, 1));
   letter-spacing: 0.2em;
   color: var(--accent);
 }
 .pkg-name {
   font-family: var(--serif);
   font-weight: 300;
-  font-size: clamp(23px, calc(2vw / var(--z)), 28px);
+  font-size: clamp(calc(23px * var(--s, 1)), 2vw, calc(28px * var(--s, 1)));
   line-height: 1.25;
   letter-spacing: 0.01em;
   min-height: 2.5em;
 }
 .pkg-price {
-  margin-top: 22px;
+  margin-top: calc(22px * var(--s, 1));
   font-family: var(--title);
-  font-size: clamp(21px, calc(1.7vw / var(--z)), 24px);
+  font-size: clamp(calc(21px * var(--s, 1)), 1.7vw, calc(24px * var(--s, 1)));
   font-weight: 400;
   letter-spacing: 0.03em;
   line-height: 1.3;
 }
 .pkg-price-note {
-  margin-top: 4px;
-  font-size: 12.5px;
+  margin-top: calc(4px * var(--s, 1));
+  font-size: calc(12.5px * var(--s, 1));
   letter-spacing: 0.08em;
   color: var(--accent);
 }
-.pkg-divider { height: 1px; background: var(--line); margin: 28px 0 24px; }
-.pkg-features { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.pkg-divider { height: 1px; background: var(--line); margin: calc(28px * var(--s, 1)) 0 calc(24px * var(--s, 1)); }
+.pkg-features { list-style: none; display: flex; flex-direction: column; gap: calc(10px * var(--s, 1)); }
 .pkg-features li {
   position: relative;
-  padding-left: 16px;
-  font-size: 14.5px;
+  padding-left: calc(16px * var(--s, 1));
+  font-size: calc(14.5px * var(--s, 1));
   line-height: 1.75;
   color: var(--ink-soft);
 }
@@ -80,29 +80,29 @@
   position: absolute;
   left: 0;
   top: 0.9em;
-  width: 6px;
+  width: calc(6px * var(--s, 1));
   height: 1px;
   background: var(--accent);
 }
 .pkg-option-label {
-  margin-top: 40px;
-  font-size: 13px;
+  margin-top: calc(40px * var(--s, 1));
+  font-size: calc(13px * var(--s, 1));
   letter-spacing: 0.08em;
   color: var(--ink);
 }
-.pkg-option-label + .pkg-divider { margin: 12px 0 18px; }
+.pkg-option-label + .pkg-divider { margin: calc(12px * var(--s, 1)) 0 calc(18px * var(--s, 1)); }
 
 .pkg-note {
-  margin-top: 44px;
-  font-size: 13.5px;
+  margin-top: calc(44px * var(--s, 1));
+  font-size: calc(13.5px * var(--s, 1));
   line-height: 2;
   letter-spacing: 0.02em;
   color: var(--ink-soft);
 }
-.pkg-cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 44px; }
-.pkg-cta .btn { font-size: 13.5px; }
+.pkg-cta { display: flex; gap: calc(12px * var(--s, 1)); flex-wrap: wrap; margin-top: calc(44px * var(--s, 1)); }
+.pkg-cta .btn { font-size: calc(13.5px * var(--s, 1)); }
 /* 이 페이지 머리 보조 문구(VAT 안내)도 +2 */
-body[data-page="package"] .page-sub { font-size: 13.5px; }
+body[data-page="package"] .page-sub { font-size: calc(13.5px * var(--s, 1)); }
 
 @media (max-width: 900px) {
   .pkg-grid { grid-template-columns: 1fr; }

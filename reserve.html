@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&family=Noto+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/lotv.css">
+<link rel="stylesheet" href="css/lotv.css?v=5">
 <script>document.documentElement.classList.add('js');</script>
 
 <style>
@@ -24,46 +24,46 @@
   align-items: flex-start;
 }
 .reserve-main,
-.reserve-side { width: 100%; max-width: 640px; }
-.reserve-side { margin-top: clamp(72px, calc(8vw / var(--z)), 112px); }
+.reserve-side { width: 100%; max-width: calc(640px * var(--s, 1)); }
+.reserve-side { margin-top: clamp(calc(72px * var(--s, 1)), 8vw, calc(112px * var(--s, 1))); }
 
 .reserve-sub {
-  font-size: 15px;
+  font-size: calc(15px * var(--s, 1));
   line-height: 2.15;
   color: var(--ink-soft);
 }
 .reserve-sub strong { font-weight: 400; color: var(--ink); }
 .reserve-list {
   list-style: none;
-  margin-top: 32px;
+  margin-top: calc(32px * var(--s, 1));
   border-top: 1px solid var(--ink);
 }
 .reserve-list li {
-  padding: 15px 0;
+  padding: calc(15px * var(--s, 1)) 0;
   border-bottom: 1px solid var(--line);
-  font-size: 14.5px;
+  font-size: calc(14.5px * var(--s, 1));
   letter-spacing: 0.04em;
   color: var(--ink);
 }
-.reserve-main .btn { margin-top: 44px; font-size: 13.5px; }
+.reserve-main .btn { margin-top: calc(44px * var(--s, 1)); font-size: calc(13.5px * var(--s, 1)); }
 
 /* 환불 규정: 박스 대신 상단 라인 하나로 구분 */
 .policy-box {
-  padding: clamp(24px, calc(2.6vw / var(--z)), 32px) 0 0;
+  padding: clamp(calc(24px * var(--s, 1)), 2.6vw, calc(32px * var(--s, 1))) 0 0;
   border-top: 1px solid var(--ink);
 }
 .policy-label {
-  font-size: 13px;
+  font-size: calc(13px * var(--s, 1));
   letter-spacing: 0.12em;
   color: var(--accent);
-  margin-bottom: 16px;
+  margin-bottom: calc(16px * var(--s, 1));
 }
 .policy-notice {
-  font-size: 14.5px;
+  font-size: calc(14.5px * var(--s, 1));
   line-height: 2.05;
   color: var(--ink-soft);
 }
-.policy-box .btn { margin-top: 28px; min-height: 46px; padding: 0 28px; font-size: 13px; }
+.policy-box .btn { margin-top: calc(28px * var(--s, 1)); min-height: calc(46px * var(--s, 1)); padding: 0 calc(28px * var(--s, 1)); font-size: calc(13px * var(--s, 1)); }
 
 @media (max-width: 480px) {
   .reserve-main .btn, .policy-box .btn { width: 100%; }
