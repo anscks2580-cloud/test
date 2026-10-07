@@ -77,7 +77,6 @@
 
   function init(D) {
     const P = (D.portfolio || []).filter(Boolean);
-    const N = P.length;
 
     renderBrand(D);
     renderIntro(D, P);
@@ -92,7 +91,6 @@
 
     const detail = setupDetail(P, D);
     const contact = setupForm(D);
-    const gallery = N ? setupGallery(P, (i) => detail.open(i)) : null;
 
     // 상세 열기 / 비슷한 홈페이지 상담하기 / 가격 / 업종 버튼 (이벤트 위임)
     doc.addEventListener('click', (e) => {
@@ -120,7 +118,8 @@
     setupHeader();
     setupMobileNav();
     setupWords();
-    setupChapters(gallery);
+    try { setupSphere(P, (i, from) => detail.open(i, from)); } catch (err) { console.error('[PAPERTOV] sphere', err); }
+    setupChapters();
     setupIndex(P);
     setupProcess();
     setupCursor();
@@ -315,277 +314,774 @@
     }
   }
 
-  /* ================================================================ HERO GALLERY
-     데스크톱: 기울어진 궤도 위에 작업이 전시되고, 가장 앞의 작품이 살짝 앞으로 나옵니다.
-     휴대폰: 카드가 겹쳐 쌓인 덱. 좌우로 넘깁니다. */
-  function setupGallery(P, onOpen) {
-    const stage = $('[data-gallery]');
-    const scene = $('[data-scene]');
-    if (!stage || !scene) return null;
-    const N = P.length;
-    const AUTO = 5200;
-
-    scene.innerHTML = P.map((p, i) =>
-      `<div class="g-card" data-i="${i}" role="button" tabindex="-1" aria-label="${esc(p.title)} 자세히 보기">${desktopFrame(p)}</div>`).join('');
-    const cards = $$('.g-card', scene);
-    cards.forEach((c) => $$('img', c).forEach((im) => im.setAttribute('loading', 'eager')));
-
-    const cap = {
-      box: $('[data-caption]'),
-      no: $('[data-cap-no]'), title: $('[data-cap-title]'), meta: $('[data-cap-meta]'), medium: $('[data-cap-medium]'),
-      index: $('[data-cap-index]'), total: $('[data-cap-total]'), timer: $('[data-timer]'),
+  /* ================================================================ HERO · WEBSITE SPHERE
+     제작한 홈페이지 화면들로 하나의 구를 만듭니다.
+     · 화면 소스: site-data.js 의 images(실제 스크린샷) → 없으면 previews.js 를 렌더한
+       assets/img/previews/{preview}-desktop|mobile.webp
+     · 위도 링을 따라 브라우저 화면(데스크톱)과 휴대폰 화면을 섞어 배치하고, 각 화면은
+       구의 곡률에 맞춰 바깥을 향합니다.
+     · 스크롤: OUTSIDE → APPROACH → CLOSE → ENTER → INSIDE → PROJECT 01 등장
+     · 화면을 누르면 그 프로젝트가 앞으로 나온 뒤 기존 상세 화면이 열립니다. */
+  const PREVIEW_DIR = 'assets/img/previews/';
+  const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+  const lerp = (a, b, t) => a + (b - a) * t;
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
-    if (cap.total) cap.total.textContent = pad2(N);
-    root.style.setProperty('--auto', AUTO + 'ms');
+  }
+  function projectSources(p) {
+    const im = p.images || {};
+    return {
+      d: im.desktop || (p.preview ? `${PREVIEW_DIR}${p.preview}-desktop.webp` : ''),
+      m: im.mobile || (!im.desktop && p.preview ? `${PREVIEW_DIR}${p.preview}-mobile.webp` : ''),
+    };
+  }
+  function loadImage(src) {
+    return new Promise((resolve) => {
+      if (!src) { resolve(null); return; }
+      const img = new Image();
+      img.decoding = 'async';
+      img.onload = () => resolve(img.naturalWidth ? img : null);
+      img.onerror = () => resolve(null);
+      img.src = src;
+    });
+  }
+  function hasWebGL() {
+    try {
+      const c = doc.createElement('canvas');
+      return !!(window.WebGLRenderingContext && (c.getContext('webgl2') || c.getContext('webgl')));
+    } catch (e) { return false; }
+  }
+  function roundRect(g, x, y, w, h, r) {
+    g.beginPath();
+    g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
+    g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
+  }
 
-    let mode = 'orbit', W = 0, H = 0, cw = 0, ch = 0, R = { x: 0, z: 0, f: 0 };
-    let t = reduced() ? 0 : -1.15, target = 0, scrollOff = 0, tilt = 0;
+  function setupSphere(P, onOpen) {
+    const hero = $('[data-hero]');
+    const stage = $('[data-stage]');
+    const host = $('[data-sphere]');
+    if (!hero || !stage || !host || !P.length) return;
+
+    const ui = { intro: $('[data-hero-intro]'), meta: $('[data-hero-meta]'), feat: $('[data-hero-feature]'), hover: $('[data-hero-hover]') };
+    const hoverDefault = ui.hover ? ui.hover.innerHTML : '';
+    const cats = unique(P.map((p) => p.categoryKo));
+    const cp = $('[data-count-projects]'); if (cp) cp.textContent = pad2(P.length);
+    const ci = $('[data-count-industries]'); if (ci) ci.textContent = pad2(cats.length);
+
+    // 구 안에서 크게 등장하는 작업 = PROJECT 01
+    const FEAT = 0;
+    const fp = P[FEAT];
+    const setText = (sel, v) => { const el = $(sel); if (el) el.textContent = v || ''; };
+    setText('[data-f-no]', pad2(FEAT + 1));
+    setText('[data-f-cat]', fp.category);
+    setText('[data-f-title]', fp.title);
+    setText('[data-f-sum]', fp.summary);
+    const fOpen = $('[data-f-open]');
+    if (fOpen) fOpen.addEventListener('click', () => onOpen(FEAT, fOpen));
+    const fBtns = $$('.hero__factions a, .hero__factions button');
+
+    const THREE = window.THREE;
+    let renderer = null, cv = null;
+    if (!THREE || !hasWebGL()) { fallback(); return; }
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+    } catch (e) { fallback(); return; }
+    const film = !reduced();
+    root.classList.toggle('film', film);
+
+    renderer.setClearColor(0x000000, 0);
+    host.appendChild(renderer.domElement);
+    cv = renderer.domElement;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(28, 1, 0.05, 240);
+    const world = new THREE.Group();
+    scene.add(world);
+
+    const R = 10;
+    const BASE_TILT = 0.2;
+    const AUTO = reduced() ? 0 : 0.045; // rad/s — 제품을 천천히 살펴보는 속도
+    const startMobile = !mq.desk.matches;
+    let mobile = startMobile;
+    let W = 1, H = 1;
+
+    /* 카메라 키프레임 (s: 0 → 1) */
+    const KEYS = {
+      desk: { z: [[0, 64], [0.1, 61], [0.44, 13.6], [0.5, 13.0], [0.82, -0.9], [1, -1.3]], fov: [[0, 28], [0.16, 28], [0.5, 40], [0.82, 50], [1, 50]] },
+      mob: { z: [[0, 67], [0.1, 64], [0.44, 14.8], [0.5, 14.1], [0.82, -0.9], [1, -1.3]], fov: [[0, 47], [0.16, 47], [0.5, 54], [0.82, 64], [1, 64]] },
+    };
+    function track(keys, s) {
+      if (s <= keys[0][0]) return keys[0][1];
+      for (let i = 1; i < keys.length; i++) {
+        if (s <= keys[i][0]) {
+          const t = easeInOut((s - keys[i - 1][0]) / (keys[i][0] - keys[i - 1][0]));
+          return lerp(keys[i - 1][1], keys[i][1], t);
+        }
+      }
+      return keys[keys.length - 1][1];
+    }
+
+    /* ---------------- 패널 셰이더
+       구 표면의 패널은 InstancedMesh 한 번의 드로우로 그립니다.
+       카메라가 표면을 통과할 때 가까운 몇 장만 따로 꺼내 반투명하게 사라지게 합니다(near pool). */
+    const FADE_START = 2.8, FADE_END = 0.9; // 이 거리 안으로 들어온 패널은 투명해지며 사라짐
+    const uniforms = {
+      uAtlas: { value: null }, uReveal: { value: 0 }, uDim: { value: 1 }, uInside: { value: 0 },
+      uFogA: { value: 40 }, uFogB: { value: 80 },
+      uLight: { value: new THREE.Vector3(-0.5, 0.62, 0.62).normalize() },
+    };
+    const SHADE = `
+        uniform sampler2D uAtlas;
+        uniform float uReveal;
+        uniform float uDim;
+        uniform float uInside;
+        uniform float uFogA;
+        uniform float uFogB;
+        uniform vec3 uLight;
+        varying vec3 vNrm;
+        varying vec2 vUv;
+        varying vec2 vUvB;
+        varying vec2 vLocal;
+        varying float vAspect;
+        varying float vFacing;
+        varying float vDist;
+        varying float vHi;
+        vec3 panelColor() {
+          vec3 col = texture2D(uAtlas, gl_FrontFacing ? vUv : vUvB).rgb;
+          // 정면은 밝게, 옆과 뒤는 어둡게. 구 안에서는 안쪽 면이 밝아집니다
+          float facing = gl_FrontFacing ? vFacing : mix(-0.75, -vFacing, uInside);
+          float shade = mix(0.1, 1.0, smoothstep(-0.12, 0.88, facing));
+          float fog = smoothstep(uFogA, uFogB, vDist);
+          // 밖에서 볼 때는 왼쪽 위에서 비추는 은은한 빛으로 구의 입체감을 줍니다
+          float lam = max(dot(normalize(vNrm), uLight), 0.0);
+          float key = mix(mix(0.42, 1.0, lam), 0.92, uInside);
+          col *= shade * key * 0.9 * mix(1.0, 0.08, fog);
+          // 화면 사이를 가르는 얇은 베젤
+          float ty = 0.02;
+          float tx = ty / max(vAspect, 0.25);
+          float inner = step(tx, vLocal.x) * step(vLocal.x, 1.0 - tx) * step(ty, vLocal.y) * step(vLocal.y, 1.0 - ty);
+          col = mix(col * 0.18, col, inner);
+          col = mix(col, col * 1.1 + 0.035, vHi);
+          return col * uDim * uReveal;
+        }`;
+    const VARY = `
+        varying vec3 vNrm;
+        varying vec2 vUv;
+        varying vec2 vUvB;
+        varying vec2 vLocal;
+        varying float vAspect;
+        varying float vFacing;
+        varying float vDist;
+        varying float vHi;`;
+    const material = new THREE.ShaderMaterial({
+      uniforms,
+      side: THREE.DoubleSide,
+      vertexShader: `
+        attribute vec4 aUv;
+        attribute float aAspect;
+        attribute float aHover;
+        attribute float aPick;
+        attribute float aHide;
+        ${VARY}
+        void main() {
+          vLocal = uv;
+          vUv = aUv.xy + uv * aUv.zw;
+          vUvB = aUv.xy + vec2(1.0 - uv.x, uv.y) * aUv.zw;
+          vAspect = aAspect;
+          vHi = max(aHover, aPick);
+          vec3 pos = position;
+          pos.xy *= 1.0 + aPick * 0.32;
+          #ifdef USE_INSTANCING
+            mat4 m = modelMatrix * instanceMatrix;
+          #else
+            mat4 m = modelMatrix;
+          #endif
+          vec3 nrm = normalize((m * vec4(0.0, 0.0, 1.0, 0.0)).xyz);
+          vNrm = nrm;
+          vec4 world = m * vec4(pos, 1.0);
+          world.xyz += nrm * (aHover * 0.3 + aPick * 1.7);
+          vec3 toCam = cameraPosition - world.xyz;
+          vDist = length(toCam);
+          vFacing = dot(nrm, toCam / max(vDist, 0.0001));
+          gl_Position = projectionMatrix * viewMatrix * world;
+          // near pool 로 옮겨진 패널은 여기서 그리지 않습니다
+          if (aHide > 0.5) gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+        }`,
+      fragmentShader: `
+        ${SHADE}
+        void main() {
+          if (vDist < 0.3) discard;
+          gl_FragColor = vec4(panelColor(), 1.0);
+        }`,
+    });
+    // 표면을 통과하는 순간의 패널: 개별 메시 + 투명도 (three.js 가 앞뒤 순서를 정렬)
+    const POOL = 16;
+    const poolMeshes = [];
+    const poolGeo = new THREE.PlaneGeometry(1, 1);
+    function poolMaterial() {
+      return new THREE.ShaderMaterial({
+        uniforms: {
+          uAtlas: uniforms.uAtlas, uReveal: uniforms.uReveal, uDim: uniforms.uDim, uInside: uniforms.uInside,
+          uFogA: uniforms.uFogA, uFogB: uniforms.uFogB, uLight: uniforms.uLight,
+          uUv: { value: new THREE.Vector4() }, uAspect: { value: 1 }, uAlpha: { value: 1 },
+        },
+        side: THREE.DoubleSide, transparent: true, depthWrite: false,
+        vertexShader: `
+          uniform vec4 uUv;
+          uniform float uAspect;
+          ${VARY}
+          void main() {
+            vLocal = uv;
+            vUv = uUv.xy + uv * uUv.zw;
+            vUvB = uUv.xy + vec2(1.0 - uv.x, uv.y) * uUv.zw;
+            vAspect = uAspect;
+            vHi = 0.0;
+            vec3 nrm = normalize((modelMatrix * vec4(0.0, 0.0, 1.0, 0.0)).xyz);
+            vNrm = nrm;
+            vec4 world = modelMatrix * vec4(position, 1.0);
+            vec3 toCam = cameraPosition - world.xyz;
+            vDist = length(toCam);
+            vFacing = dot(nrm, toCam / max(vDist, 0.0001));
+            gl_Position = projectionMatrix * viewMatrix * world;
+          }`,
+        fragmentShader: `
+          uniform float uAlpha;
+          ${SHADE}
+          void main() {
+            if (vDist < 0.2 || uAlpha < 0.004) discard;
+            gl_FragColor = vec4(panelColor(), uAlpha);
+          }`,
+      });
+    }
+    for (let k = 0; k < POOL; k++) {
+      const pm = new THREE.Mesh(poolGeo, poolMaterial());
+      pm.matrixAutoUpdate = false;
+      pm.visible = false;
+      pm.frustumCulled = false;
+      scene.add(pm);
+      poolMeshes.push(pm);
+    }
+
+    /* ---------------- 상태 */
+    let atlas = null, mesh = null, feat = null;
+    let instProj = new Int16Array(0);
+    let hoverArr = null, pickArr = null, hideArr = null, instMats = [], instCenters = [], instUv = [], instAsp = [];
+    let pooled = new Set();
+    let spin = 0, spinVel = 0, tilt = 0, tiltVel = 0, introBoost = reduced() ? 0 : 1;
     let mx = 0, my = 0, tmx = 0, tmy = 0;
-    let running = false, last = 0, focus = -1, drag = null;
-    let autoTimer = 0, hover = false, inView = true;
-    let introDone = reduced(); // 첫 진입 회전 중에는 캡션을 바꾸지 않습니다
+    let s = 0, sCur = 0, cover = 0, reveal = 0;
+    let heroTop = 0, heroH = 1, stageH = 1;
+    let raf = 0, last = 0, inView = true;
+    let drag = null, pointerDirty = false, hoverId = -1, hoverFeat = false;
+    const hoverAnim = new Map(); // instanceId → target
+    let pickAnim = null;
+    const ray = new THREE.Raycaster();
+    const ndc = new THREE.Vector2(-9, -9);
+    const dlg = $('[data-detail]');
+    const dialogOpen = () => !!(dlg && dlg.open);
+    const uiCache = {};
 
+    /* ---------------- 텍스처: 모든 화면을 한 장의 아틀라스로 */
+    const BAR = 0.075; // 데스크톱 셀 위쪽 브라우저 바 비율
+    function pack(items, AW, k) {
+      const pad = Math.max(2, Math.round(6 * k));
+      const dW = Math.round(640 * k), dH = Math.round(400 * k), mW = Math.round(240 * k), mH = Math.round(520 * k);
+      const order = items.map((_, i) => i).sort((a, b) => (items[a].kind === items[b].kind ? a - b : items[a].kind === 'd' ? -1 : 1));
+      const list = new Array(items.length);
+      let x = pad, y = pad, rowH = 0;
+      order.forEach((i) => {
+        const w = items[i].kind === 'd' ? dW : mW;
+        const h = items[i].kind === 'd' ? dH : mH;
+        if (x + w + pad > AW) { x = pad; y += rowH + pad; rowH = 0; }
+        list[i] = { x, y, w, h };
+        x += w + pad; rowH = Math.max(rowH, h);
+      });
+      return { list, height: y + rowH + pad };
+    }
+    function typeCell(g, p, x, y, w, h) {
+      g.fillStyle = '#1B1C20'; g.fillRect(x, y, w, h);
+      g.fillStyle = '#D9D9D3';
+      g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.font = `500 ${Math.round(h * 0.085)}px Hahmlet, "Noto Serif KR", serif`;
+      g.fillText(p.title, x + w / 2, y + h / 2, w * 0.86);
+    }
+    function browserBar(g, x, y, w, bh, label) {
+      g.fillStyle = '#ECECE8'; g.fillRect(x, y, w, bh);
+      g.fillStyle = '#C6C6C0';
+      for (let k = 0; k < 3; k++) { g.beginPath(); g.arc(x + bh * (0.62 + k * 0.44), y + bh / 2, bh * 0.13, 0, Math.PI * 2); g.fill(); }
+      g.fillStyle = '#DFDFDA';
+      roundRect(g, x + w * 0.3, y + bh * 0.22, w * 0.4, bh * 0.56, bh * 0.28); g.fill();
+      if (label) {
+        g.fillStyle = '#8E9096'; g.textAlign = 'center'; g.textBaseline = 'middle';
+        g.font = `500 ${Math.round(bh * 0.3)}px Archivo, "IBM Plex Sans KR", sans-serif`;
+        g.fillText(label, x + w / 2, y + bh / 2 + 0.5, w * 0.36);
+      }
+    }
+    async function buildAtlas() {
+      if (doc.fonts && doc.fonts.ready) { try { await doc.fonts.ready; } catch (_) { /* noop */ } }
+      const loaded = await Promise.all(P.map(async (p) => {
+        const src = projectSources(p);
+        const [d, m] = await Promise.all([loadImage(src.d), loadImage(src.m)]);
+        return { d, m };
+      }));
+      const big = !startMobile && renderer.capabilities.maxTextureSize >= 4096;
+      const AW = big ? 4096 : 2048, AH = AW / 2;
+      const items = [];
+      loaded.forEach((o, i) => {
+        if (o.d) {
+          const iw = o.d.naturalWidth, ih = o.d.naturalHeight;
+          const ch = iw * ((400 * (1 - BAR)) / 640);
+          items.push({ kind: 'd', project: i, img: o.d, sy: 0, sh: Math.min(ch, ih) });
+          if (ih > ch * 1.3) items.push({ kind: 'd', project: i, img: o.d, sy: Math.min(ih - ch, Math.max(ch * 0.7, ih * 0.5 - ch * 0.5)), sh: ch });
+        } else items.push({ kind: 'd', project: i, img: null });
+        if (o.m) {
+          const iw = o.m.naturalWidth, ih = o.m.naturalHeight;
+          const ch = iw * (520 / 240);
+          items.push({ kind: 'm', project: i, img: o.m, sy: 0, sh: Math.min(ch, ih) });
+          if (ih > ch * 1.28) items.push({ kind: 'm', project: i, img: o.m, sy: Math.min(ih - ch, ih * 0.45), sh: ch });
+        }
+      });
+      let k = big ? 1 : 0.5, packed = pack(items, AW, k);
+      for (let n = 0; n < 8 && packed.height > AH; n++) { k *= 0.86; packed = pack(items, AW, k); }
+      const c = doc.createElement('canvas');
+      c.width = AW; c.height = AH;
+      const g = c.getContext('2d');
+      g.fillStyle = '#121316'; g.fillRect(0, 0, AW, AH);
+      g.imageSmoothingQuality = 'high';
+      items.forEach((it, idx) => {
+        const { x, y, w, h } = packed.list[idx];
+        const p = P[it.project];
+        if (it.kind === 'd') {
+          const bh = Math.round(h * BAR);
+          browserBar(g, x, y, w, bh, '');
+          if (it.img) g.drawImage(it.img, 0, it.sy, it.img.naturalWidth, it.sh, x, y + bh, w, h - bh);
+          else typeCell(g, p, x, y + bh, w, h - bh);
+        } else if (it.img) {
+          g.drawImage(it.img, 0, it.sy, it.img.naturalWidth, it.sh, x, y, w, h);
+        } else typeCell(g, p, x, y, w, h);
+        it.uv = [(x + 1) / AW, 1 - (y + h - 1) / AH, (w - 2) / AW, (h - 2) / AH];
+        it.aspect = w / h;
+      });
+      const tex = new THREE.CanvasTexture(c);
+      tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.generateMipmaps = true;
+      return { tex, items, loaded };
+    }
+
+    /* ---------------- 위도 링 배치 */
+    function ringLayout(cfg, rand, dList, mList) {
+      const out = [];
+      const dLat = (cfg.rowH + cfg.gap) / R;
+      const rows = Math.max(3, Math.floor((cfg.latMax * 2) / dLat) + 1);
+      const lat0 = -((rows - 1) * dLat) / 2;
+      let di = Math.floor(rand() * dList.length), mi = Math.floor(rand() * Math.max(1, mList.length));
+      for (let r = 0; r < rows; r++) {
+        const lat = lat0 + r * dLat;
+        const ringR = R * Math.cos(lat);
+        const circ = Math.PI * 2 * ringR;
+        const items = [];
+        let used = 0;
+        for (;;) {
+          const useM = mList.length && rand() < cfg.mShare;
+          const crop = useM ? mList[mi++ % mList.length] : dList[di++ % dList.length];
+          const w = cfg.rowH * crop.aspect;
+          if (used + w + cfg.gap > circ) break;
+          items.push({ crop, w });
+          used += w + cfg.gap;
+        }
+        if (!items.length) continue;
+        di += 1 + Math.floor(rand() * 3);
+        mi += Math.floor(rand() * 2);
+        const extra = (circ - used) / items.length;
+        let arc = rand() * circ;
+        items.forEach((it) => {
+          const lon = (arc + it.w / 2) / ringR;
+          out.push({ lat, lon, w: it.w, h: cfg.rowH, crop: it.crop });
+          arc += it.w + cfg.gap + extra;
+        });
+      }
+      return out;
+    }
+
+    function buildPanels() {
+      if (!atlas) return;
+      if (mesh) { world.remove(mesh); mesh.geometry.dispose(); mesh = null; }
+      const rand = mulberry32(20261007);
+      const dList = atlas.items.filter((c) => c.kind === 'd');
+      const mList = atlas.items.filter((c) => c.kind === 'm');
+      for (let i = dList.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [dList[i], dList[j]] = [dList[j], dList[i]]; }
+      for (let i = mList.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [mList[i], mList[j]] = [mList[j], mList[i]]; }
+      const cfg = mobile
+        ? { rowH: 2.15, gap: 0.2, latMax: 1.2, mShare: 0.2 }
+        : { rowH: 1.55, gap: 0.16, latMax: 1.26, mShare: 0.22 };
+      const panels = ringLayout(cfg, rand, dList, mList);
+      const n = panels.length;
+      const geo = new THREE.PlaneGeometry(1, 1);
+      const aUv = new Float32Array(n * 4), aAsp = new Float32Array(n);
+      hoverArr = new Float32Array(n); pickArr = new Float32Array(n); hideArr = new Float32Array(n);
+      instProj = new Int16Array(n);
+      instMats = []; instCenters = []; instUv = []; instAsp = [];
+      pooled = new Set();
+      poolMeshes.forEach((pm) => { pm.visible = false; });
+      mesh = new THREE.InstancedMesh(geo, material, n);
+      const m4 = new THREE.Matrix4(), e = new THREE.Vector3(), u = new THREE.Vector3(), nn = new THREE.Vector3(), pp = new THREE.Vector3();
+      panels.forEach((pn, i) => {
+        const cl = Math.cos(pn.lat), sl = Math.sin(pn.lat), cL = Math.cos(pn.lon), sL = Math.sin(pn.lon);
+        nn.set(cl * sL, sl, cl * cL);            // 바깥을 향하는 법선
+        e.set(cL, 0, -sL).multiplyScalar(pn.w);   // 동쪽(가로)
+        u.set(-sl * sL, cl, -sl * cL).multiplyScalar(pn.h); // 북쪽(세로)
+        pp.copy(nn).multiplyScalar(R + (rand() - 0.5) * 0.26);
+        m4.makeBasis(e, u, nn).setPosition(pp);
+        mesh.setMatrixAt(i, m4);
+        instMats.push(m4.clone());
+        instCenters.push(pp.clone());
+        instUv.push(pn.crop.uv);
+        instAsp.push(pn.w / pn.h);
+        aUv.set(pn.crop.uv, i * 4);
+        aAsp[i] = pn.w / pn.h;
+        instProj[i] = pn.crop.project;
+      });
+      geo.setAttribute('aUv', new THREE.InstancedBufferAttribute(aUv, 4));
+      geo.setAttribute('aAspect', new THREE.InstancedBufferAttribute(aAsp, 1));
+      const hAttr = new THREE.InstancedBufferAttribute(hoverArr, 1); hAttr.setUsage(THREE.DynamicDrawUsage);
+      const pAttr = new THREE.InstancedBufferAttribute(pickArr, 1); pAttr.setUsage(THREE.DynamicDrawUsage);
+      const xAttr = new THREE.InstancedBufferAttribute(hideArr, 1); xAttr.setUsage(THREE.DynamicDrawUsage);
+      geo.setAttribute('aHover', hAttr);
+      geo.setAttribute('aPick', pAttr);
+      geo.setAttribute('aHide', xAttr);
+      mesh.instanceMatrix.needsUpdate = true;
+      mesh.frustumCulled = false;
+      world.add(mesh);
+      hoverAnim.clear(); hoverId = -1; pickAnim = null;
+    }
+
+    function buildFeature() {
+      const img = atlas.loaded[FEAT] && atlas.loaded[FEAT].d;
+      const cw = 1200, bar = 46, ch = 750;
+      const c = doc.createElement('canvas');
+      c.width = cw; c.height = ch + bar;
+      const g = c.getContext('2d');
+      g.fillStyle = '#111215'; g.fillRect(0, 0, cw, ch + bar);
+      browserBar(g, 0, 0, cw, bar, fp.host || fp.title);
+      if (img) {
+        const iw = img.naturalWidth;
+        const sh = Math.min(img.naturalHeight, (iw * ch) / cw);
+        g.drawImage(img, 0, 0, iw, sh, 0, bar, cw, (sh * cw) / iw);
+      } else typeCell(g, fp, 0, bar, cw, ch);
+      const tex = new THREE.CanvasTexture(c);
+      tex.minFilter = THREE.LinearFilter; tex.generateMipmaps = false;
+      tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+      const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0, depthTest: false, depthWrite: false, toneMapped: false });
+      feat = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), mat);
+      feat.renderOrder = 10;
+      feat.visible = false;
+      feat.userData.aspect = cw / (ch + bar);
+      scene.add(feat);
+    }
+
+    /* ---------------- 표면 통과: 가까운 패널만 투명하게 */
+    const tmpV = new THREE.Vector3();
+    const nearList = [];
+    function updatePool() {
+      if (!mesh) return;
+      nearList.length = 0;
+      const cz = camera.position.z;
+      if (cz < R + FADE_START + 1.5 && cz > -R - FADE_START - 1.5) {
+        for (let i = 0; i < instCenters.length; i++) {
+          tmpV.copy(instCenters[i]).applyMatrix4(world.matrixWorld);
+          const d = tmpV.distanceTo(camera.position);
+          if (d < FADE_START + 0.5) nearList.push([d, i]);
+        }
+        nearList.sort((x, y) => x[0] - y[0]);
+      }
+      const next = new Set();
+      for (let k = 0; k < POOL; k++) {
+        const pm = poolMeshes[k];
+        const item = nearList[k];
+        if (!item) { pm.visible = false; continue; }
+        const [d, i] = item;
+        next.add(i);
+        pm.visible = true;
+        pm.matrix.multiplyMatrices(world.matrixWorld, instMats[i]);
+        pm.matrixWorldNeedsUpdate = true;
+        const u = pm.material.uniforms;
+        u.uUv.value.set(instUv[i][0], instUv[i][1], instUv[i][2], instUv[i][3]);
+        u.uAspect.value = instAsp[i];
+        u.uAlpha.value = smooth(FADE_END, FADE_START, d);
+      }
+      let changed = false;
+      pooled.forEach((i) => { if (!next.has(i)) { hideArr[i] = 0; changed = true; } });
+      next.forEach((i) => { if (!pooled.has(i)) { hideArr[i] = 1; changed = true; } });
+      pooled = next;
+      if (changed) mesh.geometry.attributes.aHide.needsUpdate = true;
+    }
+
+    /* ---------------- 크기와 스크롤 위치 */
     function measure() {
-      const r = stage.getBoundingClientRect();
-      W = r.width; H = r.height;
-      mode = mq.desk.matches ? 'orbit' : 'deck';
-      if (mode === 'orbit') {
-        cw = clamp(Math.min(W * 0.32, H * 0.82), 260, 560);
-        R = { x: W * 0.37, z: W * 0.27, f: W * 0.1 };
-        stage.style.perspective = Math.round(Math.max(1400, W * 1.25)) + 'px';
-      } else {
-        cw = Math.min(W - 56, 440);
-        stage.style.perspective = '1000px';
-      }
-      stage.style.setProperty('--cw', cw + 'px');
-      ch = cards[0].offsetHeight || cw * 0.67;
-      stage.style.setProperty('--ch', ch + 'px');
-      apply();
+      heroTop = hero.getBoundingClientRect().top + window.scrollY;
+      heroH = hero.offsetHeight; stageH = stage.offsetHeight;
+    }
+    function resize() {
+      W = Math.max(1, stage.clientWidth); H = Math.max(1, stage.clientHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, mobile ? 1.5 : 1.75));
+      renderer.setSize(W, H, false);
+      camera.aspect = W / H;
+      measure();
+      const m = !mq.desk.matches;
+      if (m !== mobile) { mobile = m; buildPanels(); }
+      wake();
+    }
+    function readScroll() {
+      const y = window.scrollY - heroTop;
+      if (!film) { s = 0; cover = clamp(y / stageH, 0, 1); return; }
+      const len = Math.max(1, heroH - 2 * stageH);
+      s = clamp(y / len, 0, 1);
+      cover = clamp((y - len) / stageH, 0, 1);
     }
 
-    function angWrap(a) { a = mod(a + Math.PI, Math.PI * 2) - Math.PI; return a; }
-
-    function orbitSlot(p) {
-      const a = (p / N) * Math.PI * 2;
-      const c = Math.cos(a), s = Math.sin(a);
-      const front = (1 + c) / 2;
-      const near = Math.max(0, 1 - Math.abs(angWrap(a)) / ((Math.PI * 2) / N));
-      return {
-        x: R.x * s,
-        y: H * 0.05 * front,
-        z: R.f + R.z * (c - 1),
-        ry: -s * 26,
-        rz: 0,
-        s: 1 + 0.08 * easeInOut(near),
-        o: clamp(0.2 + front * 2.4, 0, 1),
-        fog: (1 - front) * 0.58,
-        depth: front,
-      };
-    }
-
-    function deckSlot(p) {
-      if (p > N - 1) p -= N; // (-1, N-1]
-      if (p < 0) {
-        return { x: p * W * 0.95, y: 0, z: 12, ry: 0, rz: p * 9, s: 1, o: clamp(1 + p * 1.1, 0, 1), fog: 0, depth: 2 + p };
-      }
-      const k = p;
-      return {
-        x: 0,
-        y: ch * 0.07 - k * ch * 0.1,
-        z: -k * 34,
-        ry: 0,
-        rz: 0,
-        s: 1 - k * 0.06,
-        o: k <= 2 ? 1 : clamp(3 - k, 0, 1),
-        fog: Math.min(k, 3) * 0.13,
-        depth: 1 - k * 0.1,
-      };
-    }
-
-    function apply() {
-      const tt = t + scrollOff;
-      for (let i = 0; i < N; i++) {
-        const p = mod(i - tt, N);
-        const S = mode === 'orbit' ? orbitSlot(p) : deckSlot(p);
-        const el = cards[i];
-        el.style.transform = `translate3d(${S.x.toFixed(1)}px,${S.y.toFixed(1)}px,${S.z.toFixed(1)}px) rotateY(${S.ry.toFixed(2)}deg) rotateZ(${S.rz.toFixed(2)}deg) scale(${S.s.toFixed(4)})`;
-        el.style.opacity = S.o.toFixed(3);
-        el.style.setProperty('--fog', S.fog.toFixed(3));
-        el.style.zIndex = String(Math.round(S.depth * 100) + 100);
-        el.style.visibility = S.o < 0.01 ? 'hidden' : 'visible';
-      }
-      if (mode === 'orbit') {
-        const rx = -7 - tilt * 9 + my * -3.2;
-        const ry = mx * 5.5;
-        scene.style.transform = `translate3d(0,${(-tilt * 24).toFixed(1)}px,0) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
-      } else {
-        scene.style.transform = 'none';
-      }
-      const f = mod(Math.round(introDone ? tt : target + scrollOff), N);
-      if (f !== focus) setFocus(f);
-    }
-
-    function setFocus(f) {
-      const first = focus === -1;
-      focus = f;
-      const p = P[f];
-      cards.forEach((c, i) => c.setAttribute('tabindex', i === f ? '0' : '-1'));
-      if (!cap.title) return;
-      cap.no.textContent = pad2(f + 1);
-      cap.index.textContent = pad2(f + 1);
-      cap.title.textContent = p.title;
-      cap.meta.textContent = [p.categoryKo, p.year].filter(Boolean).join(', ');
-      cap.medium.textContent = (p.stack || []).join(', ');
-      if (!first) {
-        cap.box.classList.remove('is-swap');
-        void cap.box.offsetWidth;
-        cap.box.classList.add('is-swap');
+    /* ---------------- 호버 / 선택 */
+    function setHover(id, isFeat) {
+      if (id === hoverId && isFeat === hoverFeat) return;
+      if (hoverId >= 0) hoverAnim.set(hoverId, 0);
+      hoverId = id; hoverFeat = isFeat;
+      if (id >= 0) hoverAnim.set(id, 1);
+      host.setAttribute('data-cursor', id >= 0 || isFeat ? 'view' : 'drag');
+      if (ui.hover) {
+        const pi = isFeat ? FEAT : id >= 0 ? instProj[id] : -1;
+        ui.hover.innerHTML = pi >= 0
+          ? `<span>${pad2(pi + 1)}</span><b>${esc(P[pi].title)}</b> ${esc(P[pi].categoryKo)}`
+          : hoverDefault;
       }
     }
-
-    function tick(now) {
-      const dt = Math.min(64, now - last) / 16.667;
-      last = now;
-      let moving = !!drag;
-      if (!drag) {
-        const d = target - t;
-        if (Math.abs(d) > 0.0004) { t += d * (1 - Math.pow(1 - 0.075, dt)); moving = true; } else t = target;
-        if (!introDone && Math.abs(target - t) < 0.02) introDone = true;
-      } else introDone = true;
-      const dx = tmx - mx, dy = tmy - my;
-      if (Math.abs(dx) > 0.0005 || Math.abs(dy) > 0.0005) {
-        const k = 1 - Math.pow(1 - 0.06, dt);
-        mx += dx * k; my += dy * k; moving = true;
+    function pickAt() {
+      if (!mesh) return { id: -1, isFeat: false };
+      ray.setFromCamera(ndc, camera);
+      if (feat && feat.visible && feat.material.opacity > 0.5 && ray.intersectObject(feat).length) return { id: -1, isFeat: true };
+      const hits = ray.intersectObject(mesh);
+      for (const h of hits) {
+        if (h.distance > FADE_START && h.instanceId != null && !pooled.has(h.instanceId)) return { id: h.instanceId, isFeat: false };
       }
-      apply();
-      if (moving) requestAnimationFrame(tick); else running = false;
+      return { id: -1, isFeat: false };
     }
-    function kick() {
-      if (running) return;
-      running = true; last = performance.now();
-      requestAnimationFrame(tick);
-    }
-
-    function go(delta) { target = Math.round(target) + delta; kick(); schedule(); }
-    function goTo(i) {
-      const base = Math.round(target);
-      let diff = i - mod(base, N);
-      if (diff > N / 2) diff -= N;
-      if (diff < -N / 2) diff += N;
-      target = base + diff; kick(); schedule();
+    function select(id) {
+      pickAnim = { id, t: 0 };
+      const pi = instProj[id];
+      setTimeout(() => onOpen(pi, host), 300);
     }
 
-    /* 자동 넘김 */
-    function restartTimerBar(run) {
-      if (!cap.timer) return;
-      cap.timer.classList.remove('is-run', 'is-paused');
-      void cap.timer.offsetWidth;
-      if (run) cap.timer.classList.add('is-run');
-    }
-    function schedule() {
-      clearTimeout(autoTimer);
-      const ok = !reduced() && inView && !doc.hidden && !hover && !drag;
-      restartTimerBar(ok);
-      if (ok) autoTimer = setTimeout(() => go(1), AUTO);
-    }
-    function pause() {
-      clearTimeout(autoTimer);
-      if (cap.timer) cap.timer.classList.add('is-paused');
-    }
-
-    /* 드래그 / 스와이프 */
-    const unit = () => (mode === 'orbit' ? W * 0.4 : cw * 0.85);
-    stage.addEventListener('pointerdown', (e) => {
+    /* ---------------- 입력: 마우스 / 드래그 (관성) / 터치 */
+    const setNdc = (e) => {
+      const r = cv.getBoundingClientRect();
+      ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    };
+    cv.addEventListener('pointerdown', (e) => {
       if (e.button !== 0) return;
-      drag = { x: e.clientX, y: e.clientY, t0: t, moved: false, id: e.pointerId, lx: e.clientX, lt: performance.now(), v: 0 };
-      pause();
+      setNdc(e);
+      drag = { x: e.clientX, y: e.clientY, lx: e.clientX, ly: e.clientY, lt: performance.now(), moved: false, id: e.pointerId, vx: 0, vy: 0 };
+      wake();
     });
-    stage.addEventListener('pointermove', (e) => {
-      if (mode === 'orbit' && mq.fine.matches && !reduced()) {
-        const r = stage.getBoundingClientRect();
-        tmx = clamp(((e.clientX - r.left) / r.width - 0.5) * 2, -1, 1);
-        tmy = clamp(((e.clientY - r.top) / r.height - 0.5) * 2, -1, 1);
-        kick();
+    cv.addEventListener('pointermove', (e) => {
+      setNdc(e);
+      pointerDirty = true;
+      if (e.pointerType === 'mouse' && !reduced()) { tmx = clamp(ndc.x, -1, 1); tmy = clamp(-ndc.y, -1, 1); }
+      if (drag && e.pointerId === drag.id) {
+        const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+        if (!drag.moved && Math.hypot(dx, dy) > 6) {
+          drag.moved = true;
+          try { cv.setPointerCapture(e.pointerId); } catch (_) { /* noop */ }
+          host.classList.add('is-dragging');
+        }
+        if (drag.moved) {
+          const now = performance.now();
+          const dts = Math.max(0.008, (now - drag.lt) / 1000);
+          const ax = (e.clientX - drag.lx) * 0.0052, ay = (e.clientY - drag.ly) * 0.0032;
+          spin += ax; tilt = clamp(tilt + ay, -0.5, 0.5);
+          drag.vx = 0.7 * drag.vx + 0.3 * (ax / dts);
+          drag.vy = 0.7 * drag.vy + 0.3 * (ay / dts);
+          drag.lx = e.clientX; drag.ly = e.clientY; drag.lt = now;
+        }
       }
-      if (!drag || e.pointerId !== drag.id) return;
-      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-      if (!drag.moved && Math.abs(dx) > 7 && Math.abs(dx) > Math.abs(dy) * 1.1) {
-        drag.moved = true;
-        try { stage.setPointerCapture(e.pointerId); } catch (_) { /* noop */ }
-        stage.classList.add('is-dragging');
-      }
-      if (drag.moved) {
-        t = drag.t0 - dx / unit();
-        target = t;
-        const now = performance.now();
-        const dtm = now - drag.lt;
-        if (dtm > 0) drag.v = 0.7 * drag.v + 0.3 * ((e.clientX - drag.lx) / dtm);
-        drag.lx = e.clientX; drag.lt = now;
-        kick();
-      }
+      wake();
     });
-    function endDrag(e, cancelled) {
+    const endDrag = (e, cancelled) => {
       if (!drag || e.pointerId !== drag.id) return;
       const d = drag;
       drag = null;
-      stage.classList.remove('is-dragging');
+      host.classList.remove('is-dragging');
       if (d.moved) {
-        const fling = clamp((-d.v * 180) / unit(), -1.6, 1.6);
-        target = Math.round(t + fling);
-        kick();
+        spinVel = clamp(d.vx, -3, 3);
+        tiltVel = clamp(d.vy, -2, 2);
       } else if (!cancelled) {
-        const card = e.target.closest('.g-card');
-        if (card) {
-          const i = +card.getAttribute('data-i');
-          if (i === focus) onOpen(i, card); else goTo(i);
+        const hit = pickAt();
+        if (hit.isFeat) onOpen(FEAT, host);
+        else if (hit.id >= 0) select(hit.id);
+      }
+      wake();
+    };
+    cv.addEventListener('pointerup', (e) => endDrag(e, false));
+    cv.addEventListener('pointercancel', (e) => endDrag(e, true));
+    cv.addEventListener('pointerleave', () => { tmx = 0; tmy = 0; ndc.set(-9, -9); setHover(-1, false); wake(); });
+
+    /* ---------------- 프레임 */
+    const setUI = (key, el, val, fn) => {
+      if (!el) return;
+      if (uiCache[key] !== undefined && Math.abs(uiCache[key] - val) < 0.002) return;
+      uiCache[key] = val;
+      fn(el, val);
+    };
+    function update(dt) {
+      readScroll();
+      if (Math.abs(s - sCur) > 0.45) sCur = s; // 앵커 이동 같은 큰 점프는 바로 맞춤
+      sCur += (s - sCur) * (1 - Math.exp(-dt / 0.11));
+
+      const K = mobile ? KEYS.mob : KEYS.desk;
+      const camZ = track(K.z, sCur);
+      camera.fov = track(K.fov, sCur);
+      const inside = smooth(R + 1.2, R - 1.2, camZ);
+      const outside = 1 - inside;
+
+      // 회전: 자동 + 드래그 관성 + 마우스
+      if (!drag) {
+        spin += spinVel * dt; spinVel *= Math.exp(-dt * 2.6);
+        tilt += tiltVel * dt; tiltVel *= Math.exp(-dt * 2.6);
+        tilt *= Math.exp(-dt * 0.6);
+      }
+      introBoost *= Math.exp(-dt * 1.6);
+      spin += (AUTO + introBoost * 0.55) * dt;
+      const km = 1 - Math.exp(-dt / 0.45);
+      mx += (tmx - mx) * km; my += (tmy - my) * km;
+      world.rotation.x = BASE_TILT * outside + tilt + my * 0.12;
+      world.rotation.y = spin + mx * 0.32;
+
+      reveal = atlas ? Math.min(1, reveal + dt / 1.5) : 0;
+      const rv = easeOut(reveal);
+      world.scale.setScalar(0.9 + 0.1 * rv);
+
+      // 카메라
+      const camX = mx * 0.45 * outside, camY = -my * 0.3 * outside;
+      camera.position.set(camX, camY, camZ);
+      camera.lookAt(camX * 0.4 + mx * 1.4 * inside, camY * 0.4 - my * 0.7 * inside, camZ - 10);
+      const off = 1 - smooth(0.08, 0.4, sCur);
+      const shiftX = mobile ? 0 : W * 0.12 * off;
+      const shiftY = (mobile ? H * 0.13 : H * 0.06) * off;
+      camera.setViewOffset(W, H, -shiftX, shiftY, W, H);
+      camera.updateProjectionMatrix();
+
+      world.updateMatrixWorld(true);
+      updatePool();
+
+      uniforms.uReveal.value = rv;
+      uniforms.uInside.value = inside;
+      uniforms.uFogA.value = lerp(camZ - R * 0.15, 8, inside);
+      uniforms.uFogB.value = lerp(camZ + R * 1.05, 34, inside);
+      uniforms.uDim.value = (0.84 + 0.16 * inside) * (1 - 0.76 * smooth(0.8, 0.95, sCur));
+
+      // PROJECT 01 이 안쪽 벽에서 앞으로 나옵니다
+      const f = easeInOut(clamp((sCur - 0.8) / 0.17, 0, 1));
+      if (feat) {
+        feat.visible = f > 0.001;
+        if (feat.visible) {
+          const a = { x: 0, y: mobile ? 0.5 : 0, z: -8.6, w: 1.9 };
+          const b = mobile ? { x: 0, y: 0.82, z: -6.3, w: 2.95 } : { x: -1.62, y: 0.08, z: -5.4, w: 3.95 };
+          const w = lerp(a.w, b.w, f);
+          feat.position.set(camX + lerp(a.x, b.x, f), camY + lerp(a.y, b.y, f), camZ + lerp(a.z, b.z, f));
+          feat.scale.set(w, w / feat.userData.aspect, 1);
+          feat.rotation.set(0, (1 - f) * (mobile ? 0 : 0.32), 0);
+          feat.material.opacity = clamp(f * 3, 0, 1);
         }
       }
-      schedule();
+
+      // 호버 판정 (드래그 중이 아닐 때, 포인터가 움직였을 때만)
+      if (pointerDirty && !drag && mesh) {
+        pointerDirty = false;
+        const hit = pickAt();
+        setHover(hit.id, hit.isFeat);
+      }
+      if (hoverArr && hoverAnim.size) {
+        hoverAnim.forEach((target, id) => {
+          const v = hoverArr[id] + (target - hoverArr[id]) * (1 - Math.exp(-dt / 0.09));
+          hoverArr[id] = Math.abs(target - v) < 0.002 ? target : v;
+          if (hoverArr[id] === target && target === 0) hoverAnim.delete(id);
+        });
+        mesh.geometry.attributes.aHover.needsUpdate = true;
+      }
+      if (pickAnim && pickArr) {
+        pickAnim.t += dt;
+        const t = pickAnim.t;
+        pickArr[pickAnim.id] = t < 0.3 ? easeOut(t / 0.3) : 1 - easeInOut(clamp((t - 0.3) / 0.9, 0, 1));
+        mesh.geometry.attributes.aPick.needsUpdate = true;
+        if (t > 1.2) { pickArr[pickAnim.id] = 0; pickAnim = null; }
+      }
+
+      // 글자: 처음 문구는 스크롤을 시작하면 물러나고, 구 안에서는 프로젝트 설명이 나옵니다
+      const ia = 1 - smooth(0.015, 0.1, sCur);
+      setUI('intro', ui.intro, ia, (el, v) => {
+        el.style.opacity = v.toFixed(3);
+        el.style.transform = `translate3d(0,${((1 - v) * -40).toFixed(1)}px,0)`;
+        el.style.visibility = v < 0.01 ? 'hidden' : '';
+      });
+      setUI('meta', ui.meta, ia, (el, v) => { el.style.opacity = v.toFixed(3); el.style.visibility = v < 0.01 ? 'hidden' : ''; });
+      const fa = smooth(0.87, 0.96, sCur);
+      setUI('feat', ui.feat, fa, (el, v) => {
+        el.style.opacity = v.toFixed(3);
+        el.classList.toggle('is-on', v > 0.001);
+        const live = v > 0.6;
+        el.classList.toggle('is-live', live);
+        el.setAttribute('aria-hidden', String(!live));
+        fBtns.forEach((b) => b.setAttribute('tabindex', live ? '0' : '-1'));
+        $('.hero__feature-in', el).style.transform = mobile ? `translate3d(0,${((1 - v) * 24).toFixed(1)}px,0)` : `translate3d(0,calc(-50% + ${((1 - v) * 24).toFixed(1)}px),0)`;
+      });
     }
-    stage.addEventListener('pointerup', (e) => endDrag(e, false));
-    stage.addEventListener('pointercancel', (e) => endDrag(e, true));
-    // 보조기기(가상 클릭) 대응
-    stage.addEventListener('click', (e) => {
-      if (e.detail !== 0) return;
-      const card = e.target.closest('.g-card');
-      if (card) onOpen(+card.getAttribute('data-i'), card);
-    });
-    stage.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') { hover = true; pause(); } });
-    stage.addEventListener('pointerleave', (e) => {
-      if (e.pointerType === 'mouse') { hover = false; tmx = 0; tmy = 0; kick(); schedule(); }
-    });
-    stage.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
-      else if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
-      else if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('g-card')) { e.preventDefault(); onOpen(focus, e.target); }
-    });
-    $('[data-prev]') && $('[data-prev]').addEventListener('click', () => go(-1));
-    $('[data-next]') && $('[data-next]').addEventListener('click', () => go(1));
+    function shouldRun() { return inView && !doc.hidden && !dialogOpen() && cover < 0.999; }
+    function idle() {
+      // 모션 줄이기 설정에서는 사용자가 움직일 때만 그립니다
+      return reduced() && !drag && Math.abs(spinVel) < 1e-3 && Math.abs(tiltVel) < 1e-3 && reveal >= 1 && !hoverAnim.size && !pickAnim;
+    }
+    function frame(now) {
+      raf = 0;
+      const dt = Math.min(0.05, Math.max(0.001, (now - last) / 1000));
+      last = now;
+      update(dt);
+      renderer.render(scene, camera);
+      if (shouldRun() && !idle()) raf = requestAnimationFrame(frame);
+    }
+    function wake() {
+      readScroll();
+      if (!raf && shouldRun()) { last = performance.now(); raf = requestAnimationFrame(frame); }
+    }
 
-    /* 화면 밖이거나 탭이 숨겨지면 멈춤 */
-    new IntersectionObserver((ents) => {
-      inView = ents[0].isIntersecting;
-      if (inView) schedule(); else pause();
-    }, { threshold: 0.15 }).observe(stage);
-    doc.addEventListener('visibilitychange', () => (doc.hidden ? pause() : schedule()));
+    new IntersectionObserver((en) => { inView = en[0].isIntersecting; wake(); }).observe(hero);
+    doc.addEventListener('visibilitychange', wake);
+    window.addEventListener('scroll', wake, { passive: true });
+    if (dlg) dlg.addEventListener('close', wake);
+    let rzT = 0;
+    window.addEventListener('resize', () => { clearTimeout(rzT); rzT = setTimeout(resize, 100); });
+    window.addEventListener('load', () => { measure(); wake(); });
+    resize();
 
-    let rz = 0;
-    window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(measure, 120); });
-    mq.desk.addEventListener && mq.desk.addEventListener('change', measure);
+    buildAtlas().then((a) => {
+      atlas = a;
+      uniforms.uAtlas.value = a.tex;
+      buildPanels();
+      buildFeature();
+      wake();
+    }).catch((err) => { console.error('[PAPERTOV] sphere', err); fallback(); });
 
-    measure();
-    kick();
-    schedule();
-
-    return {
-      setScroll(s) {
-        // 데스크톱에서 첫 화면을 스크롤해 내려갈 때 궤도가 함께 돌아갑니다.
-        const ns = mode === 'orbit' && !reduced() ? s : 0;
-        if (Math.abs(ns - tilt) < 0.0005) return;
-        tilt = ns; scrollOff = ns * 1.2;
-        kick();
-      },
-    };
+    function fallback() {
+      root.classList.remove('film');
+      if (renderer) { try { renderer.dispose(); } catch (_) { /* noop */ } if (cv && cv.parentNode) cv.parentNode.removeChild(cv); }
+      const imgs = P.map((p) => projectSources(p).d).filter(Boolean);
+      if (!imgs.length) return;
+      const list = [];
+      while (list.length < 16) list.push(...imgs);
+      host.innerHTML = `<div class="sphere-fallback">${list.slice(0, 16).map((src) => `<img src="${esc(src)}" alt="" loading="lazy">`).join('')}</div>`;
+    }
   }
 
   /* ================================================================ SCROLL SCENES */
@@ -627,7 +1123,7 @@
   function setupHeader() {
     const header = $('[data-header]');
     const mcta = $('[data-mcta]');
-    const hero = $('.hero');
+    const intro = $('[data-intro]');
     const contact = $('#contact');
     let lastY = window.scrollY;
     let contactVisible = false;
@@ -643,7 +1139,10 @@
         else if (up || y < 120) header.classList.remove('is-hidden');
       }
       lastY = y;
-      if (mcta && hero) mcta.classList.toggle('is-on', y > hero.offsetHeight * 0.75 && !contactVisible);
+      // 어두운 구 위에서는 밝은 헤더, 종이(소개 섹션)가 덮으면 원래 헤더
+      const introTop = intro ? intro.getBoundingClientRect().top : 0;
+      header.classList.toggle('on-dark', introTop > 40 && !menuOpen);
+      if (mcta) mcta.classList.toggle('is-on', introTop < window.innerHeight * 0.4 && !contactVisible);
     });
 
     const links = $$('.gnb a');
@@ -695,14 +1194,7 @@
   }
 
   /* ---------------------------------------------------------------- chapters + hero scroll */
-  function setupChapters(gallery) {
-    const hero = $('.hero');
-    if (hero && gallery) {
-      scrollHooks.push(() => {
-        const h = hero.offsetHeight;
-        gallery.setScroll(clamp(window.scrollY / Math.max(1, h), 0, 1));
-      });
-    }
+  function setupChapters() {
 
     const items = $$('[data-chapter]').map((ch) => {
       const dScreen = $('.chapter__desktop .screen', ch);
@@ -1043,8 +1535,8 @@
       const host = e.target.closest('[data-cursor]');
       tx = e.clientX; ty = e.clientY;
       if (host) {
-        let kind = host.getAttribute('data-cursor');
-        if (kind === 'drag' && e.target.closest('.g-card[tabindex="0"]')) kind = 'view';
+        const kind = host.getAttribute('data-cursor');
+        cur.classList.toggle('on-dark', !!host.closest('.hero'));
         label.textContent = names[kind] || '';
         ts = kind === 'drag' ? 0.82 : 1;
         if (!on) { on = true; x = tx; y = ty; cur.classList.add('is-on'); }

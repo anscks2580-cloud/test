@@ -8,8 +8,9 @@ assets/css/style.css       전체 디자인
 assets/css/previews.css    포트폴리오 미리보기 화면 디자인
 assets/js/site-data.js     ★ 콘텐츠 (여기만 고치면 됩니다)
 assets/js/previews.js      스크린샷이 없을 때 보이는 미리보기 화면
-assets/js/app.js           3D 갤러리, 스크롤, 상세 보기, 문의 폼 동작
+assets/js/app.js           첫 화면 3D 구(Three.js), 스크롤, 상세 보기, 문의 폼 동작
 assets/img/portfolio/      포트폴리오 스크린샷 넣는 곳
+assets/img/previews/       미리보기 화면 렌더 이미지 (구 표면 텍스처)
 ```
 
 ## 1. 내용 수정 — `assets/js/site-data.js`
@@ -44,18 +45,28 @@ assets/img/portfolio/      포트폴리오 스크린샷 넣는 곳
 
 고객 이름·전화번호 등 고객을 특정할 수 있는 정보가 지워진 데모 버전으로 캡처하는 걸 권장합니다.
 
-## 3. 문의 폼 연결 (Web3Forms)
+## 3. 첫 화면의 WEBSITE SPHERE
+
+첫 화면의 구는 `portfolio` 데이터로 자동으로 만들어집니다. 따로 관리할 데이터는 없습니다.
+
+- 구 표면의 화면: 각 프로젝트의 `images`(실제 스크린샷)를 쓰고, 없으면 `assets/img/previews/` 의 미리보기 렌더 이미지(`{preview}-desktop.webp`, `{preview}-mobile.webp`)를 씁니다.
+- 프로젝트를 추가하면 구에도 자동으로 들어갑니다. 스크린샷도 렌더 이미지도 없으면 프로젝트 이름이 적힌 패널로 대신 표시됩니다.
+- 구 안으로 들어갔을 때 크게 나오는 화면은 `portfolio` 의 첫 번째 프로젝트(PROJECT 01)입니다.
+- 스크롤 길이(구 밖에서 안으로 들어가는 구간)는 `style.css` 의 `--film` 값으로 조절합니다. (데스크톱 280vh, 휴대폰 230vh)
+- 3D(WebGL)를 쓸 수 없는 브라우저에서는 화면들을 원 안에 모은 정지 이미지로, '동작 줄이기' 설정에서는 움직이지 않는 구로 바뀝니다.
+
+## 4. 문의 폼 연결 (Web3Forms)
 
 1. https://web3forms.com 에서 받을 이메일을 입력하고 Access Key 발급
 2. `contact.web3formsKey: '발급받은-키'` 입력
 3. 이제 문의가 메일로 들어옵니다. (키가 없을 때는 전송되지 않고 안내 문구만 보입니다.)
 
-## 4. GitHub Pages 배포
+## 5. GitHub Pages 배포
 
 1. GitHub에 새 저장소를 만들고 이 폴더 안의 파일을 모두 업로드
 2. Settings → Pages → Branch `main` / `(root)` → Save
 3. 도메인 연결: Pages 설정의 Custom domain 에 도메인 입력, 도메인 업체 DNS에 GitHub Pages 주소 등록 → Enforce HTTPS 체크
 
-## 5. 나중에 관리자 페이지를 붙일 때
+## 6. 나중에 관리자 페이지를 붙일 때
 
 모든 화면은 `site-data.js` 의 객체 하나로 그려집니다. 관리자 페이지에서 같은 모양의 데이터를 Firestore 등에 저장하고, `app.js` 맨 위의 `loadSiteData()` 함수만 그 데이터를 불러오도록 바꾸면 나머지 코드는 그대로 씁니다.

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>페이퍼토브 PAPERTOV | 브랜드에 맞춰 처음부터 만드는 홈페이지</title>
 <meta name="description" content="업종과 브랜드에 맞춰 처음부터 설계하는 홈페이지 제작 스튜디오, 페이퍼토브. 디자인부터 개발, 모바일 최적화, 관리자 기능까지 직접 만듭니다.">
-<meta name="theme-color" content="#F4F4F1">
+<meta name="theme-color" content="#0B0C0E">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="페이퍼토브">
 <meta property="og:title" content="페이퍼토브 PAPERTOV">
@@ -52,64 +52,69 @@
 
 <main id="main">
 
-  <!-- ========================================================== 01 HERO -->
-  <section class="hero" id="top" aria-label="페이퍼토브 소개">
-    <div class="hero__stage" data-gallery tabindex="0" aria-label="제작 사례 3D 전시. 좌우 화살표로 넘겨 볼 수 있습니다." data-cursor="drag">
-      <div class="hero__scene" data-scene></div>
-      <span class="crop crop--tl" aria-hidden="true"></span>
-      <span class="crop crop--tr" aria-hidden="true"></span>
-      <span class="crop crop--bl" aria-hidden="true"></span>
-      <span class="crop crop--br" aria-hidden="true"></span>
-    </div>
+  <!-- ========================================================== 01 HERO · WEBSITE SPHERE
+       제작한 홈페이지 화면들이 모여 하나의 구를 이룹니다.
+       스크롤하면 카메라가 구 안으로 들어가고, PROJECT 01 이 크게 등장합니다. -->
+  <section class="hero" id="top" data-hero aria-label="페이퍼토브 소개">
+    <div class="hero__stage" data-stage>
+      <div class="hero__space" aria-hidden="true"></div>
+      <div class="hero__canvas" data-sphere data-cursor="drag" aria-hidden="true"></div>
+      <div class="hero__vignette" aria-hidden="true"></div>
 
-    <div class="hero__label wrap">
-      <div class="hero__copy">
-        <h1 class="hero__title">브랜드마다 다른 웹사이트를,<br>처음부터 직접 만듭니다.</h1>
-        <p class="hero__lead">지금 보이는 화면은 모두 페이퍼토브가 기획부터 디자인, 개발까지 직접 만든 홈페이지입니다.</p>
-        <div class="hero__actions">
-          <a class="btn btn--ink" href="#work">제작 사례 보기</a>
-          <a class="btn btn--line" href="#contact">홈페이지 제작 문의</a>
+      <div class="hero__bottom wrap">
+        <div class="hero__intro" data-hero-intro>
+          <p class="hero__label label">Brand × Web</p>
+          <h1 class="hero__title">브랜드마다 다른 웹사이트를,<br>처음부터 직접 만듭니다.</h1>
+          <p class="hero__lead">이 구는 페이퍼토브가 직접 디자인하고 개발한 홈페이지 화면들로 이루어져 있습니다.</p>
+          <div class="hero__actions">
+            <a class="btn btn--paper" href="#work">제작 사례 보기</a>
+            <a class="btn btn--ghost" href="#contact">홈페이지 제작 문의</a>
+          </div>
+        </div>
+
+        <div class="hero__meta" data-hero-meta>
+          <p class="hero__count label"><span data-count-projects>08</span> Projects <span class="hero__sep">/</span> <span data-count-industries>06</span> Industries</p>
+          <p class="hero__hover" data-hero-hover>화면을 누르면 프로젝트를 자세히 볼 수 있습니다</p>
+          <p class="hero__scroll label"><span class="hero__scroll-line" aria-hidden="true"></span>Scroll to enter</p>
         </div>
       </div>
 
-      <div class="caption" data-caption>
-        <p class="caption__no"><span class="label">PROJECT</span> <span class="label" data-cap-no>01</span></p>
-        <p class="caption__title" data-cap-title>&nbsp;</p>
-        <p class="caption__meta" data-cap-meta>&nbsp;</p>
-        <p class="caption__medium" data-cap-medium>&nbsp;</p>
-        <div class="caption__ctrl">
-          <button class="icon-btn" type="button" data-prev aria-label="이전 작업">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg>
-          </button>
-          <span class="caption__count"><span data-cap-index>01</span><span class="caption__sep">/</span><span data-cap-total>08</span></span>
-          <button class="icon-btn" type="button" data-next aria-label="다음 작업">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5"/></svg>
-          </button>
-          <span class="caption__timer" aria-hidden="true"><i data-timer></i></span>
+      <div class="hero__feature" data-hero-feature aria-hidden="true">
+        <div class="hero__feature-in">
+          <p class="hero__fno"><span class="label">Project</span> <span class="label" data-f-no>01</span></p>
+          <p class="hero__fcat label" data-f-cat></p>
+          <h2 class="hero__ftitle" data-f-title></h2>
+          <p class="hero__fsum" data-f-sum></p>
+          <div class="hero__factions">
+            <button class="btn btn--paper" type="button" data-f-open tabindex="-1">자세히 보기</button>
+            <a class="btn btn--ghost" href="#work" tabindex="-1" data-f-work>제작 사례 보기</a>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ========================================================== 02 INTRO -->
-  <section class="intro wrap" id="intro" aria-labelledby="intro-title">
-    <h2 class="sr-only" id="intro-title">페이퍼토브가 만드는 홈페이지</h2>
-    <p class="intro__statement" data-words>고객이 가장 먼저 들르는 매장은 이제 홈페이지입니다. 페이퍼토브는 그 첫 장면을 업종과 브랜드에 맞춰 처음부터 그립니다.</p>
-    <div class="intro__grid">
-      <div class="principle">
-        <h3>템플릿을 쓰지 않습니다</h3>
-        <p>업종과 브랜드를 먼저 이해하고, 화면 구성부터 새로 설계합니다.</p>
+  <!-- ========================================================== 02 INTRO (구 위로 덮이는 종이 한 장) -->
+  <section class="intro" id="intro" data-intro aria-labelledby="intro-title">
+    <div class="wrap">
+      <h2 class="sr-only" id="intro-title">페이퍼토브가 만드는 홈페이지</h2>
+      <p class="intro__statement" data-words>고객이 가장 먼저 들르는 매장은 이제 홈페이지입니다. 페이퍼토브는 그 첫 장면을 업종과 브랜드에 맞춰 처음부터 그립니다.</p>
+      <div class="intro__grid">
+        <div class="principle">
+          <h3>템플릿을 쓰지 않습니다</h3>
+          <p>업종과 브랜드를 먼저 이해하고, 화면 구성부터 새로 설계합니다.</p>
+        </div>
+        <div class="principle">
+          <h3>디자인부터 개발까지 직접</h3>
+          <p>기획한 사람이 직접 코드로 옮기기 때문에 시안과 완성본이 달라지지 않습니다.</p>
+        </div>
+        <div class="principle">
+          <h3>운영까지 생각합니다</h3>
+          <p>사진, 가격, 공지를 직접 바꿀 수 있는 관리 기능까지 함께 만듭니다.</p>
+        </div>
       </div>
-      <div class="principle">
-        <h3>디자인부터 개발까지 직접</h3>
-        <p>기획한 사람이 직접 코드로 옮기기 때문에 시안과 완성본이 달라지지 않습니다.</p>
-      </div>
-      <div class="principle">
-        <h3>운영까지 생각합니다</h3>
-        <p>사진, 가격, 공지를 직접 바꿀 수 있는 관리 기능까지 함께 만듭니다.</p>
-      </div>
+      <p class="intro__facts" data-facts></p>
     </div>
-    <p class="intro__facts" data-facts></p>
   </section>
 
   <!-- ====================================================== 03–04 PORTFOLIO -->
@@ -386,8 +391,9 @@
 <div class="mcta" data-mcta><a class="btn btn--ink" href="#contact">홈페이지 제작 문의</a></div>
 <div class="cursor" data-cursor-el aria-hidden="true"><span class="cursor__label" data-cursor-label></span></div>
 
-<script src="assets/js/site-data.js"></script>
-<script src="assets/js/previews.js"></script>
-<script src="assets/js/app.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+<script src="assets/js/site-data.js" defer></script>
+<script src="assets/js/previews.js" defer></script>
+<script src="assets/js/app.js" defer></script>
 </body>
 </html>
