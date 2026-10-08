@@ -1390,6 +1390,7 @@
     }
     function wake() {
       if (lost) return;
+      readScroll(); // 아래에서 다시 올라올 때 이전 스크롤 값으로 멈춰 있지 않도록 먼저 현재 위치를 읽습니다
       if (!raf && shouldRun()) { last = performance.now(); raf = requestAnimationFrame(frame); }
     }
 
