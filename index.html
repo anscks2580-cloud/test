@@ -10,6 +10,10 @@
 <meta property="og:site_name" content="페이퍼토브">
 <meta property="og:title" content="페이퍼토브 PAPERTOV">
 <meta property="og:description" content="브랜드마다 다른 웹사이트를, 처음부터 직접 만듭니다.">
+<script>
+  // 3D 첫 화면(스크롤 영화) 레이아웃을 처음 그릴 때부터 잡아 둡니다. WebGL 이 안 되면 app.js 가 다시 끕니다.
+  try { if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('film'); } catch (e) {}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Hahmlet:wght@200..700&family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap">
@@ -54,7 +58,8 @@
 
   <!-- ========================================================== 01 HERO · WEBSITE SPHERE
        제작한 홈페이지 화면들이 모여 하나의 구를 이룹니다.
-       스크롤하면 카메라가 구 안으로 들어가고, PROJECT 01 이 크게 등장합니다. -->
+       스크롤하면 카메라가 구를 향해 날아가 PROJECT 01 화면을 통과하고,
+       구 안에서 아래로 내려가며 프로젝트와 소개 섹션으로 이어집니다. -->
   <section class="hero" id="top" data-hero aria-label="페이퍼토브 소개">
     <div class="hero__stage" data-stage>
       <div class="hero__space" aria-hidden="true"></div>
@@ -67,15 +72,19 @@
           <h1 class="hero__title">브랜드마다 다른 웹사이트를,<br>처음부터 직접 만듭니다.</h1>
           <p class="hero__lead">이 구는 페이퍼토브가 직접 디자인하고 개발한 홈페이지 화면들로 이루어져 있습니다.</p>
           <div class="hero__actions">
-            <a class="btn btn--paper" href="#work">제작 사례 보기</a>
-            <a class="btn btn--ghost" href="#contact">홈페이지 제작 문의</a>
+            <a class="btn btn--paper btn--sm" href="#work">제작 사례 보기</a>
+            <a class="btn btn--ghost btn--sm" href="#contact">홈페이지 제작 문의</a>
           </div>
         </div>
+
+        <button class="hero__cue" type="button" data-hero-cue aria-label="구 안으로 들어가기">
+          <span class="label">Scroll to enter</span>
+          <span class="hero__cue-line" aria-hidden="true"><i></i></span>
+        </button>
 
         <div class="hero__meta" data-hero-meta>
           <p class="hero__count label"><span data-count-projects>08</span> Projects <span class="hero__sep">/</span> <span data-count-industries>06</span> Industries</p>
           <p class="hero__hover" data-hero-hover>화면을 누르면 프로젝트를 자세히 볼 수 있습니다</p>
-          <p class="hero__scroll label"><span class="hero__scroll-line" aria-hidden="true"></span>Scroll to enter</p>
         </div>
       </div>
 
@@ -94,7 +103,7 @@
     </div>
   </section>
 
-  <!-- ========================================================== 02 INTRO (구 위로 덮이는 종이 한 장) -->
+  <!-- ========================================================== 02 INTRO (구 안 바닥의 빛에서 이어지는 종이) -->
   <section class="intro" id="intro" data-intro aria-labelledby="intro-title">
     <div class="wrap">
       <h2 class="sr-only" id="intro-title">페이퍼토브가 만드는 홈페이지</h2>
