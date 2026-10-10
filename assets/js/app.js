@@ -41,31 +41,64 @@
     return Promise.resolve(window.PAPERTOV_DATA);
   }
 
-  /* ---------------------------------------------------------------- mockup markup */
-  function shotSrc(p, phone) {
-    const im = p.images || {};
+  /* ---------------------------------------------------------------- mockup markup
+     im = 보여줄 화면 묶음 { desktop, mobile }. 생략하면 프로젝트의 대표 화면(p.images)입니다.
+     상세 보기에서 다른 페이지(p.images.screens[n])를 고르면 그 묶음이 들어옵니다. */
+  const imagesOf = (p) => p.images || {};
+  function hasShots(p) {
+    const im = imagesOf(p);
+    return !!(im.desktop || im.mobile);
+  }
+  function shotSrc(im, phone) {
     return phone ? im.mobile : im.desktop;
   }
-  function hasPhoneView(p) {
-    const im = p.images || {};
+  function hasPhoneView(p, im) {
+    im = im || imagesOf(p);
     // 데스크톱 스크린샷만 있고 모바일이 없으면 휴대폰 목업은 쓰지 않습니다.
     return !(im.desktop && !im.mobile);
   }
-  function screenInner(p, phone) {
-    const src = shotSrc(p, phone);
-    if (src) return `<img class="shot" src="${esc(src)}" alt="" loading="lazy" decoding="async">`;
+  function previewHTML(p) {
     const tpl = window.PAPERTOV_PREVIEWS && window.PAPERTOV_PREVIEWS[p.preview];
-    return tpl ? tpl() : `<div class="pv pv-empty">${esc(p.title)}</div>`;
+    return tpl ? tpl() : `<div class="pv pv-empty">화면 준비 중</div>`;
   }
-  function screenHTML(p, phone) {
-    return `<span class="screen${phone ? ' is-phone' : ''}"><span class="screen__inner">${screenInner(p, phone)}</span></span>`;
+  function screenInner(p, phone, im) {
+    const src = shotSrc(im || imagesOf(p), phone);
+    if (src) return `<img class="shot" src="${esc(src)}" alt="${esc(p.title)} ${phone ? '휴대폰' : '데스크톱'} 화면" loading="lazy" decoding="async" data-pv="${esc(p.preview || '')}">`;
+    return previewHTML(p);
   }
-  function desktopFrame(p, attrs) {
-    return `<span class="frame"${attrs || ''}><span class="frame__bar"><i></i><i></i><i></i><span class="frame__url">${esc(p.host || p.title)}</span></span>${screenHTML(p, false)}</span>`;
+  function screenHTML(p, phone, im) {
+    return `<span class="screen${phone ? ' is-phone' : ''}"><span class="screen__inner">${screenInner(p, phone, im)}</span></span>`;
   }
-  function phoneFrame(p) {
-    return `<span class="phone"><span class="phone__island"></span>${screenHTML(p, true)}</span>`;
+  function desktopFrame(p, attrs, im) {
+    return `<span class="frame"${attrs || ''}><span class="frame__bar"><i></i><i></i><i></i><span class="frame__url">${esc(p.host || p.title)}</span></span>${screenHTML(p, false, im)}</span>`;
   }
+  function phoneFrame(p, im) {
+    return `<span class="phone"><span class="phone__island"></span>${screenHTML(p, true, im)}</span>`;
+  }
+  // 화면 출처 표시: 실제 화면 / 고객 정보를 가린 화면 / 가안(실제 화면 준비 중)
+  function screenState(p) {
+    if (!hasShots(p)) return { kind: 'concept', text: '가안 미리보기 · 실제 화면 준비 중' };
+    if (p.screen === 'masked') return { kind: 'masked', text: '실제 디자인 · 고객 정보 가림' };
+    return { kind: 'real', text: '실제 화면' };
+  }
+  function screenBadge(p) {
+    const s = screenState(p);
+    return `<span class="screen-badge screen-badge--${s.kind}">${esc(s.text)}</span>`;
+  }
+  // 업종 (필터, 업종 수): industry 를 기준으로, 없으면 categoryKo
+  const industryOf = (p) => p.industry || p.categoryKo || '';
+
+  // 스크린샷 파일이 없거나 경로가 틀리면 오류 화면 대신 미리보기(가안)나 '화면 준비 중'으로 바꿉니다.
+  doc.addEventListener('error', (e) => {
+    const im = e.target;
+    if (!im || im.tagName !== 'IMG' || !im.classList.contains('shot')) return;
+    const pv = im.getAttribute('data-pv');
+    const tpl = pv && window.PAPERTOV_PREVIEWS && window.PAPERTOV_PREVIEWS[pv];
+    const box = doc.createElement('div');
+    box.innerHTML = tpl ? tpl() : '<div class="pv pv-empty">화면 준비 중</div>';
+    im.replaceWith(...box.childNodes);
+    console.warn('[PAPERTOV] 화면 이미지를 찾지 못해 미리보기로 대신합니다:', im.getAttribute('src'));
+  }, true);
 
   /* ---------------------------------------------------------------- boot */
   loadSiteData()
@@ -76,7 +109,8 @@
     .catch((err) => console.error('[PAPERTOV]', err));
 
   function init(D) {
-    const P = (D.portfolio || []).filter(Boolean);
+    // public: false 인 프로젝트는 데이터만 남기고 화면(구, 제작 사례, 전체 작업, 개수)에서는 모두 뺍니다.
+    const P = (D.portfolio || []).filter((p) => p && p.public !== false);
 
     renderBrand(D);
     renderIntro(D, P);
@@ -181,7 +215,7 @@
         <div class="wrap">
           <p class="chapter__head"><span class="label">PROJECT ${no}</span><span class="rule" aria-hidden="true"></span><span class="label">${esc(p.category)}</span></p>
           <h3 class="chapter__title">${esc(p.title)}</h3>
-          <p class="chapter__sub">${esc(p.subtitle)}</p>
+          <p class="chapter__sub">${esc(p.subtitle)}${screenBadge(p)}</p>
           <div class="chapter__stage">
             <a class="chapter__desktop" ${link} data-cursor="view">${desktopFrame(p)}</a>
             ${hasPhoneView(p) ? `<div class="chapter__phone" aria-hidden="true">${phoneFrame(p)}</div>` : ''}
@@ -204,7 +238,7 @@
     const float = $('[data-float]');
     if (!list) return;
     list.innerHTML = P.map((p, i) => `
-      <li class="index__item" data-cat="${esc(p.categoryKo)}">
+      <li class="index__item" data-cat="${esc(industryOf(p))}">
         <button class="index__row" type="button" data-open="${i}" data-fi="${i}">
           <span class="row__no">${pad2(i + 1)}</span>
           <span class="row__title">${esc(p.title)}</span>
@@ -213,7 +247,7 @@
           <span class="row__go" aria-hidden="true">${ICON.arrow}</span>
         </button>
       </li>`).join('');
-    const cats = unique(P.map((p) => p.categoryKo));
+    const cats = unique(P.map(industryOf));
     if (filters) {
       filters.innerHTML = ['전체'].concat(cats).map((c, k) =>
         `<button class="chip" type="button" aria-pressed="${k === 0}" data-filter="${k === 0 ? '' : esc(c)}">${esc(c)}</button>`).join('');
@@ -343,9 +377,12 @@
   }
   function projectSources(p) {
     const im = p.images || {};
+    // x: 다른 페이지 화면 1장(있으면) — 구 표면이 한 화면만 반복되지 않도록 섞어 씁니다.
+    const extra = (im.screens || []).find((s) => s && s.desktop);
     return {
       d: im.desktop || (p.preview ? `${PREVIEW_DIR}${p.preview}-desktop.webp` : ''),
       m: im.mobile || (!im.desktop && p.preview ? `${PREVIEW_DIR}${p.preview}-mobile.webp` : ''),
+      x: im.desktop && extra ? extra.desktop : '',
     };
   }
   function loadImage(src) {
@@ -406,7 +443,7 @@
     };
     const featIn = ui.feat ? $('.hero__feature-in', ui.feat) : null;
     const hoverDefault = ui.hover ? ui.hover.innerHTML : '';
-    const cats = unique(P.map((p) => p.categoryKo));
+    const cats = unique(P.map(industryOf));
     const cpEl = $('[data-count-projects]'); if (cpEl) cpEl.textContent = pad2(P.length);
     const ciEl = $('[data-count-industries]'); if (ciEl) ciEl.textContent = pad2(cats.length);
 
@@ -720,8 +757,8 @@
       if (doc.fonts && doc.fonts.ready) { try { await doc.fonts.ready; } catch (_) { /* noop */ } }
       const loaded = await Promise.all(P.map(async (p) => {
         const src = projectSources(p);
-        const [d, m] = await Promise.all([loadImage(src.d), loadImage(src.m)]);
-        return { d, m };
+        const [d, m, x] = await Promise.all([loadImage(src.d), loadImage(src.m), loadImage(src.x)]);
+        return { d, m, x };
       }));
       const big = !startMobile && renderer.capabilities.maxTextureSize >= 4096;
       const AW = big ? 4096 : 2048, AH = AW / 2;
@@ -733,6 +770,10 @@
           items.push({ kind: 'd', project: i, img: o.d, sy: 0, sh: Math.min(ch, ih) });
           if (ih > ch * 1.3) items.push({ kind: 'd', project: i, img: o.d, sy: Math.min(ih - ch, Math.max(ch * 0.7, ih * 0.5 - ch * 0.5)), sh: ch });
         } else items.push({ kind: 'd', project: i, img: null, sy: 0 });
+        if (o.x) {
+          const ch = o.x.naturalWidth * ((400 * (1 - BAR)) / 640);
+          items.push({ kind: 'd', project: i, img: o.x, sy: 0, sh: Math.min(ch, o.x.naturalHeight), extra: true });
+        }
         if (o.m) {
           const iw = o.m.naturalWidth, ih = o.m.naturalHeight;
           const ch = iw * (520 / 240);
@@ -815,7 +856,7 @@
 
       // PROJECT 01 화면을 적도 위 몇 곳에 둡니다. 스크롤을 시작하면 가장 가까운 곳으로 날아갑니다.
       candidates = [];
-      const featCrop = atlas.items.find((it) => it.kind === 'd' && it.project === FEAT && it.sy === 0);
+      const featCrop = atlas.items.find((it) => it.kind === 'd' && it.project === FEAT && it.sy === 0 && !it.extra);
       if (featCrop) {
         let eq = Infinity;
         panels.forEach((pn) => { eq = Math.min(eq, Math.abs(pn.lat)); });
@@ -1675,18 +1716,34 @@
       summary: $('[data-d-summary]', dlg), overview: $('[data-d-overview]', dlg), palette: $('[data-d-palette]', dlg),
       fonts: $('[data-d-fonts]', dlg), stack: $('[data-d-stack]', dlg), actions: $('[data-d-actions]', dlg), device: $('[data-d-device]', dlg),
       prevT: $('[data-d-prev-title]', dlg), nextT: $('[data-d-next-title]', dlg), toggles: $$('[data-view]', dlg),
+      pages: $('[data-d-screens]', dlg), state: $('[data-d-state]', dlg),
     };
-    let cur = 0, view = 'desktop', opener = null;
+    let cur = 0, view = 'desktop', opener = null, page = 0;
 
+    // 대표 화면 + images.screens 의 다른 페이지들
+    const pagesOf = (p) => {
+      const im = imagesOf(p);
+      const main = { label: im.label || '메인', desktop: im.desktop, mobile: im.mobile };
+      const more = (im.screens || []).filter((s) => s && (s.desktop || s.mobile));
+      return hasShots(p) ? [main].concat(more) : [main];
+    };
     const renderDevice = () => {
       const p = P[cur];
-      const phone = view === 'phone' && hasPhoneView(p);
+      const list = pagesOf(p);
+      const im = list[Math.min(page, list.length - 1)];
+      const canPhone = hasPhoneView(p, im);
+      const phone = view === 'phone' && canPhone;
       el.device.classList.toggle('is-phone', phone);
-      el.device.innerHTML = phone ? phoneFrame(p) : desktopFrame(p);
+      el.device.innerHTML = phone ? phoneFrame(p, im) : desktopFrame(p, '', im);
       el.toggles.forEach((b) => {
         b.setAttribute('aria-pressed', String(b.getAttribute('data-view') === (phone ? 'phone' : 'desktop')));
-        if (b.getAttribute('data-view') === 'phone') b.disabled = !hasPhoneView(p);
+        if (b.getAttribute('data-view') === 'phone') b.disabled = !canPhone;
       });
+      if (el.pages) {
+        el.pages.hidden = list.length < 2;
+        el.pages.innerHTML = list.length < 2 ? '' : list.map((s, k) =>
+          `<button type="button" class="detail__page" aria-pressed="${k === page}" data-page="${k}">${esc(s.label || `화면 ${k + 1}`)}</button>`).join('');
+      }
     };
     const fill = () => {
       const p = P[cur];
@@ -1704,6 +1761,11 @@
       el.actions.innerHTML = `${viewBtn}<button class="btn btn--line" type="button" data-similar="${cur}">비슷한 홈페이지 상담하기</button>`;
       el.prevT.textContent = P[mod(cur - 1, P.length)].title;
       el.nextT.textContent = P[mod(cur + 1, P.length)].title;
+      if (el.state) {
+        const note = p.screenNote || (hasShots(p) ? '' : '아직 실제 화면 캡처가 없어 업종 분위기를 재현한 가안 화면을 보여드립니다.');
+        el.state.innerHTML = `${screenBadge(p)}${note ? `<span>${esc(note)}</span>` : ''}`;
+      }
+      page = 0;
       renderDevice();
       el.scroll.scrollTop = 0;
     };
@@ -1732,6 +1794,12 @@
     $('[data-d-prev]', dlg).addEventListener('click', () => api.open(cur - 1));
     $('[data-d-next]', dlg).addEventListener('click', () => api.open(cur + 1));
     el.toggles.forEach((b) => b.addEventListener('click', () => { view = b.getAttribute('data-view'); renderDevice(); }));
+    if (el.pages) el.pages.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-page]');
+      if (!b) return;
+      page = +b.getAttribute('data-page');
+      renderDevice();
+    });
     dlg.addEventListener('keydown', (e) => {
       if (e.target.closest('input,textarea')) return;
       if (e.key === 'ArrowRight') api.open(cur + 1);
