@@ -7,7 +7,7 @@
 <meta name="description" content="보습·외국어·음악·미술·무용·컴퓨터·웅변·독서분과 소식">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body data-page="divisions">
+<body data-page="divisions" data-title="분과 소식">
 
 <main id="main">
   <div class="page-body">
@@ -18,7 +18,8 @@
 <script src="assets/js/data.js"></script>
 <script src="assets/js/common.js"></script>
 <script>
-  AAOH.renderBoard("divisions", "#board", { categories: DIVISIONS, showCat: true });
+  /* 분과 선택은 상단 탭(소통마당 하위 메뉴)으로 합니다 */
+  AAOH.renderBoard("divisions", "#board", { showCat: !AAOH.qs("cat") });
 </script>
 </body>
 </html>

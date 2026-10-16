@@ -5,36 +5,49 @@
 (function () {
   "use strict";
 
-  /* ---------- 메뉴 ---------- */
+  /* ---------- 메뉴 (기존 홈페이지 메뉴명 기준) ---------- */
   var NAV = [
     { title: "연합회소개", items: [
       ["회장인사말", "greeting.html"],
-      ["역대회장", "presidents.html"],
+      ["역대회장소개", "presidents.html"],
       ["설립목적", "purpose.html"],
       ["조직", "organization.html"],
       ["오시는길", "location.html"]
     ]},
-    { title: "소통마당", items: [
-      ["분과 소식", "divisions.html"],
+    { title: "소통마당", href: "divisions.html", items: [
+      ["보습분과", "divisions.html?cat=인문보습분과"],
+      ["외국어분과", "divisions.html?cat=외국어분과"],
+      ["음악분과", "divisions.html?cat=음악분과"],
+      ["미술분과", "divisions.html?cat=미술분과"],
+      ["무용분과", "divisions.html?cat=무용분과"],
+      ["컴퓨터분과", "divisions.html?cat=컴퓨터분과"],
+      ["웅변분과", "divisions.html?cat=웅변분과"],
+      ["독서분과", "divisions.html?cat=독서분과"],
       ["정회원전용", "members-only.html"]
     ]},
     { title: "교육관리", items: [
       ["학원자율정화위원회", "committee.html"],
-      ["법정의무교육", "legal-education.html"],
-      ["설립·운영자 연수", "training.html"]
+      ["법정의무교육 과정", "legal-education.html"],
+      ["학원설립·운영자 연수교육 과정", "training.html"]
     ]},
     { title: "알림마당", items: [
       ["공지사항", "notice.html"],
-      ["행사 소식", "events.html"],
+      ["행사게시판", "events.html"],
       ["협력업체", "partners.html"]
     ]},
     { title: "AMC 경시대회", items: [
-      ["시험 안내", "amc.html"],
-      ["접수확인·수험표", "amc-ticket.html"],
+      ["시험당일 주의사항", "amc.html"],
+      ["접수확인/수험표출력", "amc-ticket.html"],
       ["성적조회", "amc-score.html"],
       ["기출문제", "amc-past.html"],
-      ["지정 접수처", "amc-centers.html"]
+      ["지정 접수처 학원", "amc-centers.html"]
     ]}
+  ];
+
+  var UTIL = [
+    ["정회원입회신청서(CMS신청서)", "join.html"],
+    ["회원가입", "register.html"],
+    ["로그인", "login.html"]
   ];
 
   /* 게시판 상세에서 목록으로 돌아갈 페이지 */
@@ -65,19 +78,34 @@
     return t.content.firstElementChild;
   }
   function telHref(t) { return "tel:" + String(t).replace(/[^0-9]/g, ""); }
+  function base(href) { return href.split("?")[0]; }
   function sortPosts(posts) {
     return posts.slice().sort(function (a, b) {
       if (!!b.pinned !== !!a.pinned) return b.pinned ? 1 : -1;
       return b.date.localeCompare(a.date) || b.id - a.id;
     });
   }
+  /* 메뉴 주소가 현재 페이지(쿼리 포함)와 같은지 */
+  function itemMatches(href, page) {
+    var parts = href.split("?");
+    if (parts[0] !== page) return false;
+    if (!parts[1]) return true;
+    var want = new URLSearchParams(parts[1]);
+    var cur = new URLSearchParams(location.search);
+    var ok = true;
+    want.forEach(function (v, k) { if (cur.get(k) !== v) ok = false; });
+    return ok;
+  }
   function findSection(page) {
+    var loose = null;
     for (var i = 0; i < NAV.length; i++) {
       for (var j = 0; j < NAV[i].items.length; j++) {
-        if (NAV[i].items[j][1] === page) return { sec: NAV[i], item: NAV[i].items[j] };
+        var it = NAV[i].items[j];
+        if (itemMatches(it[1], page)) return { sec: NAV[i], item: it };
+        if (!loose && base(it[1]) === page) loose = { sec: NAV[i], item: null };
       }
     }
-    return null;
+    return loose;
   }
   function divisionLabel(key) {
     var d = (window.DIVISIONS || []).filter(function (x) { return x.key === key; })[0];
@@ -87,11 +115,11 @@
   /* ---------- 헤더 ---------- */
   function renderHeader() {
     var gnb = NAV.map(function (sec) {
-      var active = sec.items.some(function (it) { return it[1] === here; });
+      var active = sec.items.some(function (it) { return base(it[1]) === here; });
       return '<li class="gnb-item' + (active ? " is-active" : "") + '">' +
-        '<a class="gnb-link" href="' + sec.items[0][1] + '">' + esc(sec.title) + '</a>' +
+        '<a class="gnb-link" href="' + (sec.href || sec.items[0][1]) + '">' + esc(sec.title) + '</a>' +
         '<ul class="gnb-sub">' + sec.items.map(function (it) {
-          return '<li><a href="' + it[1] + '"' + (it[1] === here ? ' aria-current="page"' : "") + '>' + esc(it[0]) + '</a></li>';
+          return '<li><a href="' + it[1] + '"' + (itemMatches(it[1], here) ? ' aria-current="page"' : "") + '>' + esc(it[0]) + '</a></li>';
         }).join("") + '</ul></li>';
     }).join("");
 
@@ -103,13 +131,12 @@
         }).join("") + '</ul></div>';
     }).join("");
 
+    var util = UTIL.map(function (u) { return '<a href="' + u[1] + '">' + esc(u[0]) + '</a>'; }).join("");
+
     var header = el(
       '<div class="site-top">' +
         '<a class="skip" href="#main">본문 바로가기</a>' +
-        '<div class="utilbar"><div class="wrap">' +
-          '<a href="join.html">정회원 입회 신청</a>' +
-          '<a href="login.html">로그인</a>' +
-        '</div></div>' +
+        '<div class="utilbar"><div class="wrap">' + util + '</div></div>' +
         '<header class="site-header"><div class="wrap">' +
           '<a class="brand" href="index.html" aria-label="' + esc(S.name) + ' 홈">' +
             '<span class="brand-seal" aria-hidden="true">安</span>' +
@@ -123,7 +150,7 @@
             '<div class="drawer-head"><strong>' + esc(S.shortName) + '</strong>' +
             '<button class="drawer-close" type="button" aria-label="메뉴 닫기">닫기</button></div>' +
             drawer +
-            '<div class="drawer-util"><a href="join.html">정회원 입회 신청</a><a href="login.html">로그인</a></div>' +
+            '<div class="drawer-util">' + util + '</div>' +
           '</div>' +
         '</div>' +
       '</div>'
@@ -159,11 +186,11 @@
     if (!main || document.body.dataset.page === "home") return;
     var page = document.body.dataset.nav || here;
     var found = findSection(page);
-    var title = document.body.dataset.title || (found ? found.item[0] : document.title.split("|")[0].trim());
+    var title = (found && found.item ? found.item[0] : "") || document.body.dataset.title || document.title.split("|")[0].trim();
     var secTitle = found ? found.sec.title : (document.body.dataset.section || "");
     var tabs = found ? '<nav class="tabs" aria-label="' + esc(secTitle) + ' 하위 메뉴"><div class="wrap"><ul>' +
       found.sec.items.map(function (it) {
-        return '<li><a href="' + it[1] + '"' + (it[1] === page ? ' aria-current="page"' : "") + '>' + esc(it[0]) + '</a></li>';
+        return '<li><a href="' + it[1] + '"' + (found.item === it ? ' aria-current="page"' : "") + '>' + esc(it[0]) + '</a></li>';
       }).join("") + '</ul></div></nav>' : "";
     var head = el(
       '<div class="page-head">' +
@@ -225,7 +252,7 @@
           (p.link ? '<a class="btn btn-primary" href="' + esc(p.link) + '">' + esc(p.linkText || "자세히 보기") + '</a>' : "") +
         '</div>' +
         '<div class="popup-foot">' +
-          '<label><input type="checkbox" class="popup-hide"> 오늘 하루 보지 않기</label>' +
+          '<label><input type="checkbox" class="popup-hide"> 24시간 동안 보지 않기</label>' +
           '<button type="button" class="popup-close">닫기</button>' +
         '</div>' +
       '</div>'
@@ -299,11 +326,15 @@
       }).join("") + '</ul>';
     } else if (board.course) {
       html += '<div class="table-wrap"><table class="table course"><caption class="sr-only">' + esc(board.title) + ' 과정 목록</caption>' +
-        '<thead><tr><th scope="col">과정명</th><th scope="col">신청기간</th><th scope="col">교육기간</th><th scope="col">교육장소</th></tr></thead><tbody>' +
+        '<thead><tr><th scope="col">과정명</th><th scope="col">신청기간</th><th scope="col">교육기간</th><th scope="col">교육장소</th><th scope="col">신청</th></tr></thead><tbody>' +
         slice.map(function (p) {
+          var apply = p.link
+            ? '<a class="btn btn-line btn-sm" href="' + esc(p.link) + '" target="_blank" rel="noopener">수강 사이트</a>'
+            : '<span class="muted">준비중</span>';
           return '<tr' + (p.pinned ? ' class="is-pinned"' : "") + '><td class="t-title"><a href="post.html?b=' + boardKey + '&id=' + p.id + '">' +
             (p.pinned ? '<span class="tag">진행</span>' : "") + esc(p.title) + '</a></td>' +
-            '<td data-label="신청기간">' + esc(p.apply) + '</td><td data-label="교육기간">' + esc(p.period) + '</td><td data-label="교육장소">' + esc(p.place) + '</td></tr>';
+            '<td data-label="신청기간">' + esc(p.apply) + '</td><td data-label="교육기간">' + esc(p.period) + '</td><td data-label="교육장소">' + esc(p.place) + '</td>' +
+            '<td data-label="신청">' + apply + '</td></tr>';
         }).join("") + '</tbody></table></div>';
     } else {
       html += '<ul class="list">' + slice.map(function (p) {
@@ -338,7 +369,6 @@
       root.innerHTML = '<p class="empty">찾는 글이 없습니다. 주소가 바뀌었거나 삭제된 글일 수 있습니다.</p><p class="center"><a class="btn btn-line" href="notice.html">공지사항으로 가기</a></p>';
       return;
     }
-    document.body.dataset.nav = BOARD_PAGE[key];
     document.title = post.title + " | " + S.shortName;
 
     var list = sortPosts(board.posts).filter(function (p) { return !p.pinned; });
@@ -391,10 +421,14 @@
     divisionLabel: divisionLabel
   };
 
-  /* 게시글 상세는 헤더를 그리기 전에 현재 메뉴를 정해야 합니다 */
+  /* 게시글 상세는 헤더를 그리기 전에 현재 메뉴와 제목을 정해야 합니다 */
   if (document.body.dataset.page === "post") {
     var k = qs("b");
-    if (BOARD_PAGE[k]) { document.body.dataset.nav = BOARD_PAGE[k]; here = BOARD_PAGE[k]; }
+    if (BOARD_PAGE[k]) {
+      document.body.dataset.nav = BOARD_PAGE[k];
+      here = BOARD_PAGE[k];
+      if (window.BOARDS[k]) document.body.dataset.title = window.BOARDS[k].title;
+    }
   }
 
   renderHeader();

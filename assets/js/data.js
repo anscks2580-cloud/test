@@ -15,7 +15,7 @@ window.SITE = {
   privacyOfficer: "회장 김범수",
   formEmail: "ayaa5678@kakao.com", // 정회원 입회 신청서가 도착할 메일 (FormSubmit)
   popup: {
-    enabled: false,
+    enabled: true, // 기존 사이트 메인 팝업(AMC 지정 접수처 링크)과 동일하게 노출
     id: "amc-2026",
     title: "AMC 안양시 수학경시대회 지정 접수처 안내",
     text: "가까운 지정 접수처 학원에서 접수할 수 있습니다.",
@@ -169,7 +169,22 @@ window.BOARDS = {
     course: true,
     posts: [
       { id: 3, pinned: true, date: "2026-06-27", title: "2026년 학원·독서실 설립운영자 연수 및 외국인강사 연수 안내",
-        apply: "2026-07-06 ~ 2026-07-29", period: "2026-07-06 ~ 2026-07-29", place: "온라인교육" },
+        apply: "2026-07-06 ~ 2026-07-29", period: "2026-07-06 ~ 2026-07-29", place: "온라인교육 (비대면)",
+        link: "http://www.ggdacaedu2026.co.kr",
+        body:
+          '<p>교육비는 무료이며 온라인(비대면)으로 진행합니다.</p>' +
+          '<p><a class="btn btn-navy" href="http://www.ggdacaedu2026.co.kr" target="_blank" rel="noopener">연수 홈페이지 바로가기</a></p>' +
+          '<p class="hint">PC는 구글 크롬, 모바일은 크롬 앱으로 접속하세요.</p>' +
+          '<h3>지역별 수강 기간</h3>' +
+          '<ul><li>1차 지역: 7월 6일 ~ 7월 15일 (10일)</li><li>2차 지역: 7월 16일 ~ 7월 25일 (10일)</li><li>전 지역 추가: 7월 26일 ~ 7월 29일 (4일)</li></ul>' +
+          '<p class="hint">시·군별 일정표(붙임1)는 기존 게시글 첨부 이미지를 옮긴 뒤 올라옵니다.</p>' +
+          '<h3>강의 내용</h3>' +
+          '<ol><li>공지사항, 인사말, 학원 관리법(개정 사항 포함)</li><li>아동학대 신고의무자 교육</li><li>긴급복지지원 신고의무 교육</li><li>장애인 학대 신고의무자 교육 (1차시)</li><li>장애인 학대 신고의무자 교육 (2차시)</li><li>학원장이 알아야 할 노무 교육</li></ol>' +
+          '<p class="hint">강의 순서와 명칭은 미리 알리지 않고 바뀔 수 있습니다.</p>' +
+          '<h3>꼭 확인하세요</h3>' +
+          '<ul><li>1교시부터 6교시까지 모두 수강한 학원·독서실 설립운영자는 3대 법정 의무교육 이수자로 자동 처리됩니다.</li>' +
+          '<li>학원 강사와 종사자는 이 연수와 별개로 3대 법정 의무교육을 따로 수강하고, 관할 교육지원청에 직접 통보해야 합니다.</li></ul>' +
+          '<p>문의: 안양시학원연합회 031-444-6780</p>' },
       { id: 2, date: "2024-08-12", title: "2024년 학원·독서실 설립운영자 교육",
         apply: "2024-08-12 ~ 2024-09-22", period: "2024-08-12 ~ 2024-09-22", place: "온라인교육" }
     ]
@@ -181,7 +196,13 @@ window.BOARDS = {
     course: true,
     posts: [
       { id: 4, date: "2024-01-01", title: "2024년 법정의무교육 안내",
-        apply: "2024-01-01 ~ 2024-12-31", period: "2024-01-01 ~ 2024-12-31", place: "인터넷 및 현장교육" }
+        apply: "2024-01-01 ~ 2024-12-31", period: "2024-01-01 ~ 2024-12-31", place: "인터넷 및 현장교육",
+        link: "http://www.gseek.kr",
+        body:
+          '<p>경기도 평생학습포털 GSEEK에서 인터넷으로 수강하거나 현장교육으로 이수할 수 있습니다.</p>' +
+          '<p><a class="btn btn-navy" href="http://www.gseek.kr" target="_blank" rel="noopener">GSEEK 바로가기</a></p>' +
+          '<p class="hint">교육 안내 이미지 2장은 기존 게시글 첨부파일을 옮긴 뒤 올라옵니다.</p>' +
+          '<p>문의: 안양시학원연합회 031-444-6780 (평일 09:00 ~ 17:00, 점심 12:00 ~ 13:00, 주말·공휴일 휴무)</p>' }
     ]
   },
 
@@ -239,17 +260,16 @@ window.ORGANIZATION = [
   { group: "미술분과", members: [["홍성원", "잠수함속토끼미술학원"], ["조하민", "아트스타미술학원"], ["이현수", "구루미술학원"]] }
 ];
 
-/* 협력업체 (업무협약 체결처) — 혜택 상세는 정회원 전용 */
+/* 협력업체 — 기존 사이트 '협력업체 및 기관' 게시판(전체 9건 중 목록에 보이는 7건) 기준.
+   혜택 상세는 정회원 전용입니다. */
 window.PARTNERS = [
-  { name: "경기도학원안전공제회", field: "학원 배상책임보험" },
-  { name: "ABM경영컨설팅", field: "노무 자문" },
-  { name: "(주)안양장례식장", field: "장례 서비스" },
-  { name: "메트로병원·장례식장", field: "의료·장례" },
-  { name: "평촌이생각치과", field: "치과 진료" },
-  { name: "메가탑치과", field: "치과 진료" },
-  { name: "삼성전자 삼성스토어", field: "전자제품 구매" },
-  { name: "안양문화예술재단", field: "문화예술 협력" },
-  { name: "안양시가족센터", field: "가족 지원 협력" }
+  { name: "평촌이생각치과", field: "치과" },
+  { name: "안양시 가족센터", field: "협력기관" },
+  { name: "(사)안양시학원연합회 세무사", field: "세무 상담" },
+  { name: "(사)안양시학원연합회 노무사", field: "노무 상담" },
+  { name: "(사)안양시학원연합회 변호사", field: "법률 상담" },
+  { name: "메가치과", field: "치과" },
+  { name: "365매일한방병원 안양평촌점", field: "한방병원" }
 ];
 
 /* AMC 수학경시대회 — 회차가 바뀌면 이 부분만 고치면 됩니다 */
@@ -289,10 +309,23 @@ window.AMC = {
   sponsor: "안양시",
   author: "동아출판 수학평가연구소",
   certify: "동아출판 수학평가연구소, 안양시 학원연합회",
+  /* 지정 접수처 학원 — id 는 기존 사이트 글 번호(amc06 wr_id) */
   centers: [
-    "바른길 수학", "백년대계 학림학원", "지엔탑학원", "인어스수학학원",
-    "G1230 안양캠퍼스", "대시나루국어학원", "한빛주니어학원", "강의하는 아이들",
-    "유수하 수학학원", "수학이 만드는 세상", "송우찬수학학원", "스카이학원",
-    "대치레몬", "리더스학원", "한빛학원", "동일학원"
+    { id: 8, name: "바른길 수학", address: "경기 안양시 동안구 평촌대로 116 5층", tel: "031-382-4785", blog: "https://blog.naver.com/barungil_edu" },
+    { id: 10, name: "백년대계 학림학원", address: "경기 안양시 동안구 귀인로 262", tel: "031-387-2229", blog: "https://blog.naver.com/haklimacademy" },
+    { id: 1, name: "지엔탑학원", address: "경기 안양시 만안구 장내로 63 3-5층", tel: "031-444-0096", blog: "https://blog.naver.com/gntop0096" },
+    { id: 2, name: "인어스수학학원", address: "경기 안양시 동안구 평촌대로 111 피플스프라자 205호", tel: "031-385-3466", blog: "https://blog.naver.com/inus-math" },
+    { id: 13, name: "G1230 안양캠퍼스", address: "경기 안양시 만안구 태평로52번길 37 링크오빌딩 304호", tel: "031-442-1230", blog: "https://blog.naver.com/gnbmanan" },
+    { id: 3, name: "대시나루국어학원", address: "경기 안양시 동안구 평촌대로 109 협성골드 프라자 301호", tel: "031-388-2066", blog: "https://blog.naver.com/theangry" },
+    { id: 15, name: "한빛주니어학원", address: "경기 안양시 만안구 태평로52번길 21 308호", tel: "031-347-1113", blog: "" },
+    { id: 11, name: "강의하는 아이들", address: "경기 안양시 동안구 평촌대로 140 205, 206호", tel: "0507-1405-0873", blog: "https://blog.naver.com/kakia0319" },
+    { id: 7, name: "유수하 수학학원", address: "경기 안양시 동안구 평촌대로 133 3·4·6·7층", tel: "031-386-3340", blog: "https://blog.naver.com/ushacademy", site: "https://www.mathush.co.kr/" },
+    { id: 5, name: "수학이 만드는 세상", address: "경기 안양시 만안구 안양동 1389-2 3층", tel: "031-444-2223", blog: "https://blog.naver.com/kbsmathlove" },
+    { id: 4, name: "송우찬수학학원", address: "경기 안양시 동안구 평촌대로 117 맵시프라자 4층", tel: "031-386-8899", blog: "https://blog.naver.com/fanmath" },
+    { id: 9, name: "스카이학원", address: "경기 안양시 만안구 안양로 399 동양빌딩 4층", tel: "031-443-8902", blog: "" },
+    { id: 6, name: "대치레몬", address: "경기 안양시 동안구 관악대로 177 401호", tel: "031-388-8734", blog: "https://blog.naver.com/kongti_66" },
+    { id: 12, name: "리더스학원", address: "경기 안양시 동안구 관악대로 374 홍은빌딩 3층", tel: "031-424-0027", blog: "https://blog.naver.com/leaders3179" },
+    { id: 14, name: "한빛학원", address: "경기 안양시 만안구 태평로52번길 21 312호", tel: "031-441-4331", blog: "" },
+    { id: 16, name: "동일학원", address: "경기 안양시 만안구 안양로 483 지구빌딩 3층", tel: "010-3269-0009", blog: "https://blog.naver.com/knam1118" }
   ]
 };

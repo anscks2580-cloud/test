@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AMC 지정 접수처 | 안양시학원연합회</title>
-<meta name="description" content="AMC 안양시 수학경시대회 지정 접수처 학원 목록">
+<title>지정 접수처 학원 | 안양시학원연합회</title>
+<meta name="description" content="AMC 안양시 수학경시대회 지정 접수처 학원 주소와 연락처">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body data-page="amc-centers">
@@ -24,9 +24,17 @@
 <script src="assets/js/data.js"></script>
 <script src="assets/js/common.js"></script>
 <script>
+  var e = AAOH.esc;
   document.getElementById("count").textContent = AMC.centers.length;
   document.getElementById("centers").innerHTML = AMC.centers.map(function (c) {
-    return "<li>" + AAOH.esc(c) + "</li>";
+    var links = [];
+    if (c.site) links.push('<a href="' + e(c.site) + '" target="_blank" rel="noopener">홈페이지</a>');
+    if (c.blog) links.push('<a href="' + e(c.blog) + '" target="_blank" rel="noopener">블로그</a>');
+    return '<li id="c' + c.id + '">' +
+      '<h2 class="center-name">' + e(c.name) + '</h2>' +
+      '<p class="center-addr">' + e(c.address) + '</p>' +
+      '<p class="center-meta"><a href="tel:' + c.tel.replace(/[^0-9]/g, "") + '">' + e(c.tel) + '</a>' +
+      (links.length ? links.join("") : "") + '</p></li>';
   }).join("");
 </script>
 </body>

@@ -15,7 +15,7 @@
       "sub1-1.php": "purpose.html", "sub1-2.php": "greeting.html", "sub1-3.php": "greeting.html",
       "sub1-7.php": "location.html", "sub1-9.php": "organization.html", "sub2-1.php": "committee.html",
       "amc01.php": "amc.html", "amc02.php": "amc-ticket.html", "amcv02.php": "amc-score.html",
-      "register.php": "join.html", "login.php": "login.html"
+      "register.php": "register.html", "login.php": "login.html"
     };
     var boards = {
       sub4_1: ["notice", "notice.html"], sub5_4: ["events", "events.html"], sub5_6: ["divisions", "divisions.html"],
@@ -25,6 +25,7 @@
     };
     var to = null;
     if (pages[path]) to = pages[path];
+    else if (path === "board.php" && q.get("bo_table") === "amc06" && q.get("wr_id")) to = "amc-centers.html#c" + encodeURIComponent(q.get("wr_id"));
     else if ((path === "board.php" || path === "write.php") && boards[q.get("bo_table")]) {
       var b = boards[q.get("bo_table")];
       if (b[0] && q.get("wr_id")) to = "post.html?b=" + b[0] + "&id=" + encodeURIComponent(q.get("wr_id"));

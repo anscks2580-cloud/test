@@ -11,16 +11,16 @@ GitHub Pages로 올리는 정적 홈페이지입니다. 빌드 과정 없이 파
 | 역대회장 사진 | `assets/img/presidents/` 에 넣고 `PRESIDENTS` 의 `photo` 에 경로 입력 |
 | 조직 | `ORGANIZATION` |
 | 협력업체 | `PARTNERS` |
-| AMC 회차 정보·접수처 | `AMC` |
+| AMC 회차 정보·지정 접수처(주소·연락처·블로그) | `AMC` |
 | 메뉴 | `assets/js/common.js` 맨 위 `NAV` |
 | 색상·글꼴 | `assets/css/style.css` 맨 위 `:root` |
 
 ## 아직 연결이 필요한 기능
 
-- **회원 로그인 / 정회원전용**: 화면만 있음. 회원 시스템(Firebase Auth 등) 연결 필요.
+- **회원가입 / 로그인 / 정회원전용**: 약관 동의·로그인 화면만 있음. 회원 시스템(Firebase Auth 등) 연결 필요. 기존 사이트의 가입 양식 항목은 확인하지 못함.
 - **AMC 수험표·성적 조회**: 화면과 출력 양식은 완성. 학생 개인정보라 데이터는 이 저장소에 넣지 말고 외부 DB에 두고 `assets/js/amc.js` 의 `AMC_API` 로 연결. 연결 후 `data.js` 에서 `ticketOpen`, `scoreOpen` 을 `true` 로.
 - **정회원 입회 신청**: FormSubmit 으로 `SITE.formEmail` 에 메일 발송. 처음 한 번은 FormSubmit 인증 메일을 확인해야 접수가 시작됨.
-- **게시물 본문·사진**: 기존 사이트 DB 받은 뒤 `body`, `thumb`, `files` 채우기.
+- **게시물 본문·사진**: 연수·법정의무교육 과정 2건만 본문 입력됨. 나머지는 기존 사이트 DB 받은 뒤 `body`, `thumb`, `files` 채우기. 역대회장 사진 7장, 로고, 행사 사진도 같은 방식.
 
 ## 도메인 연결 순서
 
