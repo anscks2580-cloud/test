@@ -35,7 +35,7 @@
       ["행사게시판", "events.html"],
       ["협력업체", "partners.html"]
     ]},
-    { title: "AMC 경시대회", items: [
+    { title: "AMC 경시대회", short: "AMC", items: [
       ["시험당일 주의사항", "amc.html"],
       ["접수확인/수험표출력", "amc-ticket.html"],
       ["성적조회", "amc-score.html"],
@@ -117,7 +117,7 @@
     var gnb = NAV.map(function (sec) {
       var active = sec.items.some(function (it) { return base(it[1]) === here; });
       return '<li class="gnb-item' + (active ? " is-active" : "") + '">' +
-        '<a class="gnb-link" href="' + (sec.href || sec.items[0][1]) + '">' + esc(sec.title) + '</a>' +
+        '<a class="gnb-link" href="' + (sec.href || sec.items[0][1]) + '"' + (sec.short ? ' aria-label="' + esc(sec.title) + '"' : "") + '>' + esc(sec.short || sec.title) + '</a>' +
         '<ul class="gnb-sub">' + sec.items.map(function (it) {
           return '<li><a href="' + it[1] + '"' + (itemMatches(it[1], here) ? ' aria-current="page"' : "") + '>' + esc(it[0]) + '</a></li>';
         }).join("") + '</ul></li>';
@@ -139,8 +139,8 @@
         '<div class="utilbar"><div class="wrap">' + util + '</div></div>' +
         '<header class="site-header"><div class="wrap">' +
           '<a class="brand" href="index.html" aria-label="' + esc(S.name) + ' 홈">' +
-            '<span class="brand-seal" aria-hidden="true">安</span>' +
-            '<span class="brand-text"><span class="brand-pre">사단법인</span><span class="brand-name">' + esc(S.shortName) + '</span></span>' +
+            (S.logo ? '<img class="brand-logo" src="' + esc(S.logo) + '" alt="">' : '<span class="brand-seal" aria-hidden="true">安</span>') +
+            '<span class="brand-text"><span class="brand-name">' + esc(S.shortName) + '</span><span class="brand-en" lang="en">' + esc(S.enName || "") + '</span></span>' +
           '</a>' +
           '<nav class="gnb" aria-label="주 메뉴"><ul>' + gnb + '</ul></nav>' +
           '<button class="menu-btn" type="button" aria-label="전체 메뉴 열기" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span></button>' +
@@ -180,6 +180,14 @@
     });
   }
 
+  /* ---------- 오른쪽 배너 (학원생 안전) ---------- */
+  function sideBanner() {
+    var b = S.safetyBanner;
+    if (!b) return "";
+    return '<a class="side-banner" href="' + esc(b.url) + '" target="_blank" rel="noopener" aria-label="' + esc(b.text) + ' (새 창)">' +
+      '<strong>' + esc(b.title) + '</strong>' + esc(b.text) + '<br>상담 : ' + esc(b.tel) + '</a>';
+  }
+
   /* ---------- 서브 페이지 상단 ---------- */
   function renderPageHead() {
     var main = document.getElementById("main");
@@ -188,16 +196,29 @@
     var found = findSection(page);
     var title = (found && found.item ? found.item[0] : "") || document.body.dataset.title || document.title.split("|")[0].trim();
     var secTitle = found ? found.sec.title : (document.body.dataset.section || "");
-    var tabs = found ? '<nav class="tabs" aria-label="' + esc(secTitle) + ' 하위 메뉴"><div class="wrap"><ul>' +
+    var secHref = found ? (found.sec.href || found.sec.items[0][1]) : "";
+    var sv = S.subVisual || {};
+
+    var tabs = found ? '<nav class="tabs" aria-label="' + esc(secTitle) + ' 하위 메뉴"><ul>' +
       found.sec.items.map(function (it) {
         return '<li><a href="' + it[1] + '"' + (found.item === it ? ' aria-current="page"' : "") + '>' + esc(it[0]) + '</a></li>';
-      }).join("") + '</ul></div></nav>' : "";
+      }).join("") + '</ul></nav>' : "";
+
+    var crumb = '<nav class="crumb" aria-label="현재 위치"><a href="index.html">Home</a>' +
+      (secTitle ? '<span class="sep" aria-hidden="true">&gt;</span>' + (secHref ? '<a href="' + secHref + '">' + esc(secTitle) + '</a>' : '<span>' + esc(secTitle) + '</span>') : "") +
+      '<span class="sep" aria-hidden="true">&gt;</span><span aria-current="page">' + esc(title) + '</span></nav>';
+
     var head = el(
       '<div class="page-head">' +
-        '<div class="wrap page-head-inner">' +
-          (secTitle ? '<p class="page-sec">' + esc(secTitle) + '</p>' : "") +
-          '<h1 class="page-title">' + esc(title) + '</h1>' +
-        '</div>' + tabs +
+        '<div class="sub-visual' + (sv.image ? ' has-image" style="background-image:url(\'' + esc(sv.image) + '\')' : "") + '">' +
+          '<div class="sv-inner"><p class="sv-slogan">' + esc(S.slogan || "") + '</p>' +
+          '<p class="sv-sec">' + esc(secTitle || title) + '</p></div>' +
+          (sv.image && sv.caption ? '<span class="sv-cap">' + esc(sv.caption) + '</span>' : "") +
+        '</div>' +
+        '<div class="sub-top">' +
+          '<div class="wrap">' + crumb + tabs + '</div>' + sideBanner() +
+        '</div>' +
+        '<div class="wrap page-title-wrap"><h1 class="page-title">' + esc(title) + '</h1></div>' +
       '</div>'
     );
     main.insertBefore(head, main.firstChild);
@@ -205,7 +226,7 @@
     var cur = head.querySelector(".tabs a[aria-current]");
     if (cur) {
       var ul = cur.closest("ul");
-      ul.scrollLeft = cur.offsetLeft - (ul.clientWidth - cur.offsetWidth) / 2;
+      if (ul.scrollWidth > ul.clientWidth) ul.scrollLeft = cur.parentNode.offsetLeft - (ul.clientWidth - cur.offsetWidth) / 2;
     }
   }
 
@@ -216,23 +237,21 @@
     }).join("");
     var footer = el(
       '<footer class="site-footer"><div class="wrap">' +
-        '<div class="footer-brand">' +
-          '<span class="brand-seal" aria-hidden="true">安</span>' +
-          '<p><strong>' + esc(S.name) + '</strong><br>' + esc(S.address) + '</p>' +
-        '</div>' +
-        '<dl class="footer-info">' +
-          '<div><dt>전화</dt><dd><a href="' + telHref(S.tel) + '">' + esc(S.tel) + '</a></dd></div>' +
-          '<div><dt>이메일</dt><dd><a href="mailto:' + esc(S.email) + '">' + esc(S.email) + '</a></dd></div>' +
-          '<div><dt>사무국</dt><dd>' + esc(S.hours) + '</dd></div>' +
-          '<div><dt>개인정보보호책임자</dt><dd>' + esc(S.privacyOfficer) + '</dd></div>' +
-        '</dl>' +
         '<div class="footer-links">' +
           '<a href="privacy.html"><strong>개인정보처리방침</strong></a>' +
           '<a href="terms.html">이용약관</a>' +
           '<a href="terms.html#email">이메일무단수집거부</a>' +
-          (banners ? '<span class="footer-sep" aria-hidden="true"></span>' + banners : "") +
+          banners +
         '</div>' +
-        '<p class="copy">© ' + new Date().getFullYear() + ' ' + esc(S.name) + '</p>' +
+        '<p class="footer-info">' +
+          '<span>' + esc(S.name) + '</span>' +
+          '<span>' + esc(S.address) + '</span><br>' +
+          '<span>전화 <a href="' + telHref(S.tel) + '">' + esc(S.tel) + '</a></span>' +
+          '<span>이메일 <a href="mailto:' + esc(S.email) + '">' + esc(S.email) + '</a></span>' +
+          '<span>개인정보보호책임자 ' + esc(S.privacyOfficer) + '</span><br>' +
+          '<span>사무국 ' + esc(S.hours) + '</span>' +
+        '</p>' +
+        '<p class="copy">Copyright © ' + esc(S.name) + '. All rights reserved.</p>' +
       '</div></footer>'
     );
     document.body.appendChild(footer);
@@ -416,7 +435,7 @@
   }
 
   window.AAOH = {
-    NAV: NAV, esc: esc, fmtDate: fmtDate, qs: qs,
+    NAV: NAV, esc: esc, fmtDate: fmtDate, qs: qs, sideBanner: sideBanner,
     renderBoard: renderBoard, renderPost: renderPost, renderLatest: renderLatest,
     divisionLabel: divisionLabel
   };

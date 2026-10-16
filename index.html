@@ -14,78 +14,42 @@
 
 <main id="main">
 
-  <section class="hero" aria-labelledby="hero-title">
+  <section class="main-visual" aria-roledescription="carousel" aria-label="연합회 소개 사진">
+    <div id="slides"></div>
+    <div class="mv-dots" id="dots"></div>
+  </section>
+
+  <section class="main-gallery" aria-labelledby="mg-title">
     <div class="wrap">
-      <div>
-        <h1 id="hero-title">안양 학원인의 권익을 위해<br>50년을 함께 걸어왔습니다</h1>
-        <p class="hero-lead">학원 설립·운영자 연수와 법정의무교육, 학원 자율정화, 지역 교육 행사까지. 안양시 학원장님들의 운영을 곁에서 돕습니다.</p>
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="join.html">정회원 입회 신청</a>
-          <a class="btn btn-ghost" href="notice.html">공지사항 보기</a>
-        </div>
+      <div class="mg-head">
+        <p class="mg-pre">학원교육의 건전한 발전과 새로운 가치 실현</p>
+        <h2 class="mg-title" id="mg-title">안양시학원연합회 <em>행사갤러리</em></h2>
+        <p class="mg-desc">안양시학원연합회 총회, 연수, 봉사, 행사, 뉴스 등 다양한 활동이 담긴 회원 사진첩입니다.</p>
       </div>
-      <p class="anniv">
-        <span class="anniv-num" aria-hidden="true">50</span>
-        <span class="anniv-cap"><strong>창립 50주년</strong>1976년 4월 5일 창립</span>
-      </p>
+      <div class="carousel">
+        <button class="carousel-btn prev" type="button" aria-label="이전 사진">&lt;</button>
+        <ul class="carousel-track" id="gallery"></ul>
+        <button class="carousel-btn next" type="button" aria-label="다음 사진">&gt;</button>
+      </div>
     </div>
   </section>
 
-  <nav class="tasks" aria-label="자주 찾는 업무">
-    <div class="wrap">
-      <ul>
-        <li><a href="training.html"><strong>설립·운영자 연수</strong><span>학원 설립·운영자 필수 연수 일정</span></a></li>
-        <li><a href="legal-education.html"><strong>법정의무교육</strong><span>과정별 90% 이상 수료 시 이수증 발급</span></a></li>
-        <li><a href="amc-ticket.html"><strong>AMC 수험표·성적</strong><span>안양시 수학경시대회 조회</span></a></li>
-        <li><a href="join.html"><strong>정회원 입회 신청</strong><span>협력업체 혜택과 정회원 전용 소식</span></a></li>
-      </ul>
-    </div>
-  </nav>
-
-  <section class="home-sec">
-    <div class="wrap cols">
+  <section class="main-band">
+    <div class="wrap band-cols">
       <div>
-        <div class="sec-head">
-          <h2 class="sec-title">공지사항</h2>
-          <a class="more" href="notice.html">전체 보기</a>
-        </div>
-        <p class="sec-desc">연수·교육 일정과 학원 운영 관련 안내를 알려 드립니다.</p>
+        <div class="band-head"><h2>공지사항</h2><a class="more" href="notice.html">more +</a></div>
         <ul class="home-list" id="latest-notice"></ul>
       </div>
       <div>
-        <div class="sec-head">
-          <h2 class="sec-title">행사갤러리</h2>
-          <a class="more" href="events.html">전체 보기</a>
-        </div>
-        <p class="sec-desc">총회, 연수, 봉사, 행사, 뉴스 등 연합회 활동을 담은 회원 사진첩입니다.</p>
-        <ul class="home-list" id="latest-events"></ul>
+        <div class="band-head"><h2>AMC 경시대회</h2><a class="more" href="amc.html">more +</a></div>
+        <ul class="quick">
+          <li><a href="amc.html">시험당일 주의사항</a></li>
+          <li><a href="amc-ticket.html">접수확인/수험표출력</a></li>
+          <li><a href="amc-score.html">성적조회</a></li>
+          <li><a href="amc-past.html">기출문제</a></li>
+          <li><a href="amc-centers.html">지정 접수처 학원</a></li>
+        </ul>
       </div>
-    </div>
-  </section>
-
-  <section class="amc-band" aria-labelledby="amc-title">
-    <div class="wrap">
-      <div>
-        <h2 id="amc-title">AMC 안양시 수학경시대회</h2>
-        <p>안양시 학원연합회 보습분과 협의회가 주최하고 안양시가 후원하는 초등 1학년 ~ 중학교 3학년 수학경시대회입니다. 출제는 동아출판 수학평가연구소가 맡습니다.</p>
-      </div>
-      <div class="amc-links">
-        <a href="amc.html"><strong>시험 안내</strong><span>일시, 장소, 준비물, 시상</span></a>
-        <a href="amc-ticket.html"><strong>접수확인·수험표</strong><span>성명과 학부모 휴대폰번호로 조회</span></a>
-        <a href="amc-score.html"><strong>성적조회</strong><span>성명과 수험번호로 조회</span></a>
-        <a href="amc-centers.html"><strong>지정 접수처</strong><span>가까운 접수처 학원 찾기</span></a>
-      </div>
-    </div>
-  </section>
-
-  <section class="home-sec">
-    <div class="wrap">
-      <div class="sec-head">
-        <h2 class="sec-title">협력업체</h2>
-        <a class="more" href="partners.html">혜택 안내</a>
-      </div>
-      <ul class="partner-row" id="partner-row"></ul>
-      <p class="partner-note">업무협약을 맺은 업체로, 연합회 확인을 받은 정회원 학원만 이용할 수 있습니다.</p>
     </div>
   </section>
 
@@ -94,11 +58,53 @@
 <script src="assets/js/data.js"></script>
 <script src="assets/js/common.js"></script>
 <script>
-  AAOH.renderLatest("notice", "#latest-notice", 6);
-  AAOH.renderLatest("events", "#latest-events", 6);
-  document.getElementById("partner-row").innerHTML = PARTNERS.slice(0, 6).map(function (p) {
-    return '<li><strong>' + AAOH.esc(p.name) + '</strong><span>' + AAOH.esc(p.field) + '</span></li>';
-  }).join("");
+  (function () {
+    var e = AAOH.esc;
+    /* 큰 사진 */
+    var slides = (SITE.slides || []).filter(Boolean);
+    var box = document.getElementById("slides"), dots = document.getElementById("dots");
+    box.innerHTML = slides.map(function (s, i) {
+      var H = i === 0 ? "h1" : "h2";
+      return '<div class="mv-slide' + (i === 0 ? ' is-on' : '') + (s.image ? ' has-image" style="background-image:url(\'' + e(s.image) + '\')' : '') + '"' + (i ? ' aria-hidden="true"' : '') + '>' +
+        '<div class="wrap mv-text"><' + H + '>' + e(s.title) + '</' + H + '><p>' + e(s.text) + '</p></div></div>';
+    }).join("");
+    box.insertAdjacentHTML("afterend", AAOH.sideBanner());
+    var cur = 0, timer;
+    function go(n) {
+      var els = box.children;
+      els[cur].classList.remove("is-on"); els[cur].setAttribute("aria-hidden", "true");
+      dots.children[cur].removeAttribute("aria-current");
+      cur = (n + els.length) % els.length;
+      els[cur].classList.add("is-on"); els[cur].removeAttribute("aria-hidden");
+      dots.children[cur].setAttribute("aria-current", "true");
+    }
+    if (slides.length > 1) {
+      dots.innerHTML = slides.map(function (s, i) {
+        return '<button type="button" aria-label="' + (i + 1) + '번째 사진"' + (i === 0 ? ' aria-current="true"' : '') + '></button>';
+      }).join("");
+      Array.prototype.forEach.call(dots.children, function (b, i) {
+        b.addEventListener("click", function () { go(i); clearInterval(timer); });
+      });
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) timer = setInterval(function () { go(cur + 1); }, 5000);
+    }
+
+    /* 행사갤러리 */
+    var posts = BOARDS.events.posts.slice().sort(function (a, b) { return b.date.localeCompare(a.date) || b.id - a.id; }).slice(0, 10);
+    var track = document.getElementById("gallery");
+    track.innerHTML = posts.map(function (p) {
+      var d = p.date.split("-");
+      var thumb = p.thumb
+        ? '<img src="' + e(p.thumb) + '" alt="" loading="lazy">'
+        : '<span class="plate" aria-hidden="true"><span class="plate-y">' + d[0] + '</span><span class="plate-md">' + Number(d[1]) + '.' + Number(d[2]) + '</span></span>';
+      return '<li><a href="post.html?b=events&id=' + p.id + '"><span class="gallery-thumb">' + thumb + '</span>' +
+        '<span class="gallery-title">' + e(p.title) + '</span><time datetime="' + p.date + '">' + p.date + '</time></a></li>';
+    }).join("");
+    function step(dir) { var li = track.firstElementChild; track.scrollLeft += dir * (li ? li.offsetWidth + 3 : 150); }
+    document.querySelector(".carousel-btn.prev").addEventListener("click", function () { step(-1); });
+    document.querySelector(".carousel-btn.next").addEventListener("click", function () { step(1); });
+
+    AAOH.renderLatest("notice", "#latest-notice", 6);
+  })();
 </script>
 </body>
 </html>

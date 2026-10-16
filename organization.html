@@ -12,7 +12,7 @@
 <main id="main">
   <div class="page-body">
     <div class="wrap">
-      <div class="org" id="org"></div>
+      <div class="orgchart" id="org"></div>
     </div>
   </div>
 </main>
@@ -20,13 +20,48 @@
 <script src="assets/js/data.js"></script>
 <script src="assets/js/common.js"></script>
 <script>
-  var e = AAOH.esc;
-  document.getElementById("org").innerHTML = ORGANIZATION.map(function (g) {
-    return '<section class="org-row"><h2>' + e(g.group) + '</h2><ul>' +
-      g.members.map(function (m) {
-        return '<li>' + (m[2] ? '<em>' + e(m[2]) + '</em>' : '') + '<b>' + e(m[0]) + '</b><span>' + e(m[1]) + '</span></li>';
-      }).join("") + '</ul></section>';
-  }).join("");
+  (function () {
+    var e = AAOH.esc;
+    function group(name) {
+      return (ORGANIZATION.filter(function (g) { return g.group === name; })[0] || { members: [] }).members;
+    }
+    function spaced(n) { return '<span class="nm">' + e(n) + '</span>'; }
+    /* 상자 하나: 제목 + (이름, 학원) 줄 */
+    function box(kind, title, members, opts) {
+      opts = opts || {};
+      var rows = members.map(function (m, i) {
+        if (opts.division) {
+          return '<li' + (i === 0 ? '' : ' class="m"') + '>' + spaced(m[0]) + '<span class="ac">(' + e(m[1]) + ')</span></li>';
+        }
+        var name = (opts.role && m[2] ? e(m[2]) + ' ' : '') + spaced(m[0]);
+        return '<li>' + name + '</li><li>' + e(m[1]) + '</li>';
+      }).join("");
+      return '<section class="ob ' + kind + '"><h2>' + e(title) + '</h2><ul>' + rows + '</ul></section>';
+    }
+    function tier(boxes, last) {
+      return '<ul class="tier' + (last ? ' last' : '') + '">' + boxes.map(function (b) { return '<li>' + b + '</li>'; }).join("") + '</ul>';
+    }
+
+    var vice = group("부회장").map(function (m) { return box("vice", "부회장", [m]); });
+    vice.push(box("vice", "명예부회장", group("명예부회장")));
+    var directors = group("이사").map(function (m) { return box("vice", m[2], [m]); });
+    var divisions = group("분과장").map(function (m) {
+      var name = m[2].replace(/장$/, "");
+      return box("div", name, [m].concat(group(name)), { division: true });
+    });
+
+    document.getElementById("org").innerHTML =
+      '<div class="org-head">' +
+        '<div class="l">' + box("com", "선거관리위원회", group("선거관리위원회"), { role: true }) +
+                            box("com", "윤리위원회", group("윤리위원회"), { role: true }) + '</div>' +
+        '<div class="c">' + box("top", "회장", group("회장")) + '<div class="spine"></div>' +
+                            box("vice", "수석부회장", group("수석부회장")) + '</div>' +
+        '<div class="r">' + box("top", "감사", group("감사")) + '</div>' +
+      '</div>' +
+      '<div class="org-down"></div>' + tier(vice) +
+      '<div class="org-down"></div>' + tier(directors) +
+      '<div class="org-down"></div>' + tier(divisions, true);
+  })();
 </script>
 </body>
 </html>

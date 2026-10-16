@@ -20,16 +20,15 @@
 <script src="assets/js/data.js"></script>
 <script src="assets/js/common.js"></script>
 <script>
-  document.getElementById("presidents").innerHTML = PRESIDENTS.map(function (p, i) {
+  var e = AAOH.esc;
+  document.getElementById("presidents").innerHTML = PRESIDENTS.map(function (p) {
     var photo = p.photo
-      ? '<img src="' + AAOH.esc(p.photo) + '" alt="' + AAOH.esc(p.name) + ' 회장" loading="lazy">'
-      : '<span class="initial" aria-hidden="true">' + AAOH.esc(p.name.charAt(0)) + '</span>';
-    return '<li class="president' + (i === 0 ? ' is-current' : '') + '">' +
+      ? '<img src="' + e(p.photo) + '" alt="' + e(p.name) + ' 회장" loading="lazy">'
+      : '<span class="ph" aria-hidden="true" style="height:100%"></span>';
+    return '<li class="president">' +
       '<div class="photo">' + photo + '</div>' +
-      '<p class="term">' + AAOH.esc(p.term) + '</p>' +
-      '<h2 class="name">' + AAOH.esc(p.name) + '</h2>' +
-      '<span class="academy">' + AAOH.esc(p.academy) + '</span>' +
-      '<span class="period">' + AAOH.esc(p.period) + '</span></li>';
+      '<h2 class="head"><span class="term">' + e(p.term.replace(/·/g, ",")) + '</span>' + e(p.name) + '회장님</h2>' +
+      '<ul class="info"><li>' + e(p.academy) + '</li><li>' + e(p.period) + '</li></ul></li>';
   }).join("");
 </script>
 </body>
