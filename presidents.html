@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>역대회장 | 안양시학원연합회</title>
+<meta name="description" content="(사)안양시학원연합회 제1대부터 현재까지 역대 회장">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="presidents">
+
+<main id="main">
+  <div class="page-body">
+    <div class="wrap">
+      <ul class="presidents" id="presidents"></ul>
+    </div>
+  </div>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/common.js"></script>
+<script>
+  document.getElementById("presidents").innerHTML = PRESIDENTS.map(function (p, i) {
+    var photo = p.photo
+      ? '<img src="' + AAOH.esc(p.photo) + '" alt="' + AAOH.esc(p.name) + ' 회장" loading="lazy">'
+      : '<span class="initial" aria-hidden="true">' + AAOH.esc(p.name.charAt(0)) + '</span>';
+    return '<li class="president' + (i === 0 ? ' is-current' : '') + '">' +
+      '<div class="photo">' + photo + '</div>' +
+      '<p class="term">' + AAOH.esc(p.term) + '</p>' +
+      '<h2 class="name">' + AAOH.esc(p.name) + '</h2>' +
+      '<span class="academy">' + AAOH.esc(p.academy) + '</span>' +
+      '<span class="period">' + AAOH.esc(p.period) + '</span></li>';
+  }).join("");
+</script>
+</body>
+</html>

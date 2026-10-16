@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AMC 시험 안내 | 안양시학원연합회</title>
+<meta name="description" content="AMC 안양시 수학경시대회 시험 일시, 장소, 준비물, 주차, 시상 안내">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="amc">
+
+<main id="main">
+  <div class="page-body">
+    <div class="wrap amc-grid">
+      <div class="prose" id="amc-body"></div>
+      <aside class="amc-side" aria-label="빠른 조회">
+        <h2 id="amc-round"></h2>
+        <dl>
+          <dt>시험일시</dt><dd id="side-date"></dd>
+          <dt>시험장소</dt><dd id="side-place"></dd>
+          <dt>수험표 교부</dt><dd id="side-ticket"></dd>
+        </dl>
+        <a class="btn btn-navy" href="amc-ticket.html">수험표 출력</a>
+        <a class="btn btn-line" href="amc-score.html">성적조회</a>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/common.js"></script>
+<script>
+  var e = AAOH.esc, A = AMC;
+  document.getElementById("amc-round").textContent = A.round;
+  document.getElementById("side-date").textContent = A.examDate;
+  document.getElementById("side-place").textContent = A.place;
+  document.getElementById("side-ticket").textContent = A.ticketPeriod;
+
+  function li(arr) { return arr.map(function (x) { return "<li>" + e(x) + "</li>"; }).join(""); }
+
+  document.getElementById("amc-body").innerHTML =
+    '<h2>대회 개요</h2>' +
+    '<dl class="facts">' +
+      '<dt>시험일시</dt><dd>' + e(A.examDate) + '</dd>' +
+      '<dt>입실</dt><dd>' + e(A.checkIn) + '</dd>' +
+      '<dt>시험장소</dt><dd>' + e(A.place) + '</dd>' +
+      '<dt>시험시간</dt><dd>' + A.duration.map(function (d) { return e(d[0]) + ": " + e(d[1]); }).join("<br>") + '</dd>' +
+      '<dt>문항 구성</dt><dd>' + e(A.questions) + '</dd>' +
+      '<dt>준비물</dt><dd>' + e(A.bring) + '</dd>' +
+    '</dl>' +
+    '<h2>주차 안내</h2><ul class="duties">' + li(A.parking) + '</ul>' +
+    '<h2>시험 당일 유의사항</h2><ul class="duties">' + li(A.notes) + '</ul>' +
+    '<h2>시상</h2>' +
+    '<p>우수한 성적을 거둔 학생에게는 안양시장님이 직접 상장을 수여합니다.</p>' +
+    '<dl class="facts">' +
+      '<dt>일시</dt><dd>' + e(A.award.date) + '</dd>' +
+      '<dt>장소</dt><dd>' + e(A.award.place) + '</dd>' +
+      '<dt>대상</dt><dd>' + e(A.award.target) + '</dd>' +
+      '<dt>그 밖의 상</dt><dd>' + e(A.award.etc) + '</dd>' +
+    '</dl>' +
+    '<h2>주최와 출제</h2>' +
+    '<dl class="facts">' +
+      '<dt>주최</dt><dd>' + e(A.host) + '</dd>' +
+      '<dt>후원</dt><dd>' + e(A.sponsor) + '</dd>' +
+      '<dt>출제</dt><dd>' + e(A.author) + '</dd>' +
+      '<dt>인증</dt><dd>' + e(A.certify) + '</dd>' +
+    '</dl>';
+</script>
+</body>
+</html>

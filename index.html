@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>(사)안양시학원연합회</title>
+<meta name="description" content="1976년 창립한 사단법인 안양시학원연합회. 학원 설립·운영자 연수, 법정의무교육, 학원자율정화, AMC 안양시 수학경시대회를 운영합니다.">
+<meta property="og:title" content="(사)안양시학원연합회">
+<meta property="og:description" content="안양 학원인의 권익을 위해 1976년부터 함께합니다.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="home">
+
+<main id="main">
+
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="wrap">
+      <div>
+        <h1 id="hero-title">안양 학원인의 권익을 위해<br>50년을 함께 걸어왔습니다</h1>
+        <p class="hero-lead">학원 설립·운영자 연수와 법정의무교육, 학원 자율정화, 지역 교육 행사까지. 안양시 학원장님들의 운영을 곁에서 돕습니다.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="join.html">정회원 입회 신청</a>
+          <a class="btn btn-ghost" href="notice.html">공지사항 보기</a>
+        </div>
+      </div>
+      <p class="anniv">
+        <span class="anniv-num" aria-hidden="true">50</span>
+        <span class="anniv-cap"><strong>창립 50주년</strong>1976년 4월 5일 창립</span>
+      </p>
+    </div>
+  </section>
+
+  <nav class="tasks" aria-label="자주 찾는 업무">
+    <div class="wrap">
+      <ul>
+        <li><a href="training.html"><strong>설립·운영자 연수</strong><span>학원 설립·운영자 필수 연수 일정</span></a></li>
+        <li><a href="legal-education.html"><strong>법정의무교육</strong><span>과정별 90% 이상 수료 시 이수증 발급</span></a></li>
+        <li><a href="amc-ticket.html"><strong>AMC 수험표·성적</strong><span>안양시 수학경시대회 조회</span></a></li>
+        <li><a href="join.html"><strong>정회원 입회 신청</strong><span>협력업체 혜택과 정회원 전용 소식</span></a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="home-sec">
+    <div class="wrap cols">
+      <div>
+        <div class="sec-head">
+          <h2 class="sec-title">공지사항</h2>
+          <a class="more" href="notice.html">전체 보기</a>
+        </div>
+        <ul class="home-list" id="latest-notice"></ul>
+      </div>
+      <div>
+        <div class="sec-head">
+          <h2 class="sec-title">행사 소식</h2>
+          <a class="more" href="events.html">전체 보기</a>
+        </div>
+        <ul class="home-list" id="latest-events"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="amc-band" aria-labelledby="amc-title">
+    <div class="wrap">
+      <div>
+        <h2 id="amc-title">AMC 안양시 수학경시대회</h2>
+        <p>안양시 학원연합회 보습분과 협의회가 주최하고 안양시가 후원하는 초등 1학년 ~ 중학교 3학년 수학경시대회입니다. 출제는 동아출판 수학평가연구소가 맡습니다.</p>
+      </div>
+      <div class="amc-links">
+        <a href="amc.html"><strong>시험 안내</strong><span>일시, 장소, 준비물, 시상</span></a>
+        <a href="amc-ticket.html"><strong>접수확인·수험표</strong><span>성명과 학부모 휴대폰번호로 조회</span></a>
+        <a href="amc-score.html"><strong>성적조회</strong><span>성명과 수험번호로 조회</span></a>
+        <a href="amc-centers.html"><strong>지정 접수처</strong><span>가까운 접수처 학원 찾기</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="home-sec">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="sec-title">협력업체</h2>
+        <a class="more" href="partners.html">혜택 안내</a>
+      </div>
+      <ul class="partner-row" id="partner-row"></ul>
+    </div>
+  </section>
+
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/common.js"></script>
+<script>
+  AAOH.renderLatest("notice", "#latest-notice", 6);
+  AAOH.renderLatest("events", "#latest-events", 6);
+  document.getElementById("partner-row").innerHTML = PARTNERS.slice(0, 6).map(function (p) {
+    return '<li><strong>' + AAOH.esc(p.name) + '</strong><span>' + AAOH.esc(p.field) + '</span></li>';
+  }).join("");
+</script>
+</body>
+</html>

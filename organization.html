@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>조직 | 안양시학원연합회</title>
+<meta name="description" content="(사)안양시학원연합회 임원 및 분과 구성">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="organization">
+
+<main id="main">
+  <div class="page-body">
+    <div class="wrap">
+      <div class="org" id="org"></div>
+    </div>
+  </div>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/common.js"></script>
+<script>
+  var e = AAOH.esc;
+  document.getElementById("org").innerHTML = ORGANIZATION.map(function (g) {
+    return '<section class="org-row"><h2>' + e(g.group) + '</h2><ul>' +
+      g.members.map(function (m) {
+        return '<li>' + (m[2] ? '<em>' + e(m[2]) + '</em>' : '') + '<b>' + e(m[0]) + '</b><span>' + e(m[1]) + '</span></li>';
+      }).join("") + '</ul></section>';
+  }).join("");
+</script>
+</body>
+</html>

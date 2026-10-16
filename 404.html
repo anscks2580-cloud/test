@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>페이지를 찾을 수 없습니다 | 안양시학원연합회</title>
+<meta name="robots" content="noindex">
+<base href="/">
+<script>
+  /* 기존 홈페이지(그누보드) 주소로 들어오면 새 주소로 보냅니다 */
+  (function () {
+    var path = location.pathname.split("/").pop();
+    var q = new URLSearchParams(location.search);
+    var pages = {
+      "sub1-1.php": "purpose.html", "sub1-2.php": "greeting.html", "sub1-3.php": "greeting.html",
+      "sub1-7.php": "location.html", "sub1-9.php": "organization.html", "sub2-1.php": "committee.html",
+      "amc01.php": "amc.html", "amc02.php": "amc-ticket.html", "amcv02.php": "amc-score.html",
+      "register.php": "join.html", "login.php": "login.html"
+    };
+    var boards = {
+      sub4_1: ["notice", "notice.html"], sub5_4: ["events", "events.html"], sub5_6: ["divisions", "divisions.html"],
+      sub3_1: ["training", "training.html"], sub3_2: ["legal", "legal-education.html"], amcv04: ["amcPast", "amc-past.html"],
+      sub1_2: [null, "presidents.html"], sub4_3: [null, "partners.html"], sub5_7: [null, "members-only.html"],
+      amc06: [null, "amc-centers.html"], sub6_1: [null, "join.html"]
+    };
+    var to = null;
+    if (pages[path]) to = pages[path];
+    else if ((path === "board.php" || path === "write.php") && boards[q.get("bo_table")]) {
+      var b = boards[q.get("bo_table")];
+      if (b[0] && q.get("wr_id")) to = "post.html?b=" + b[0] + "&id=" + encodeURIComponent(q.get("wr_id"));
+      else {
+        to = b[1];
+        if (b[0] === "divisions" && q.get("sca")) to += "?cat=" + encodeURIComponent(q.get("sca"));
+      }
+    }
+    if (to) {
+      var base = location.pathname.replace(/\/bbs\/[^/]*$/, "/").replace(/\/[^/]*$/, "/");
+      location.replace(base + to);
+    }
+  })();
+</script>
+<link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body data-page="404" data-title="페이지를 찾을 수 없습니다">
+
+<main id="main">
+  <div class="page-body">
+    <div class="wrap narrow">
+      <div class="locked">
+        <h2>찾는 페이지가 없습니다</h2>
+        <p>주소가 바뀌었거나 삭제된 페이지입니다. 홈에서 메뉴를 다시 골라 주세요.</p>
+        <div class="form-actions">
+          <a class="btn btn-navy" href="/index.html">홈으로</a>
+          <a class="btn btn-line" href="/notice.html">공지사항</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="/assets/js/data.js"></script>
+<script src="/assets/js/common.js"></script>
+</body>
+</html>

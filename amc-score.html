@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>성적조회 | 안양시학원연합회</title>
+<meta name="description" content="AMC 안양시 수학경시대회 성적조회">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="amc-score">
+
+<main id="main">
+  <div class="page-body">
+    <div class="wrap lookup">
+      <section class="lookup-card" aria-labelledby="lk-title">
+        <h2 id="lk-title">성적 조회</h2>
+        <p class="hint" id="lk-round"></p>
+        <form class="form" id="lookup" style="margin-top:24px" novalidate>
+          <div class="form-row">
+            <label for="name">학생 성명<span class="req" aria-hidden="true">*</span></label>
+            <input class="input" id="name" name="name" autocomplete="off" placeholder="예: 홍길동" required>
+          </div>
+          <div class="form-row">
+            <label for="key">수험번호<span class="req" aria-hidden="true">*</span></label>
+            <input class="input" id="key" name="key" inputmode="numeric" autocomplete="off" placeholder="예: 24125020" required>
+            <p class="hint">수험표에 적힌 8자리 번호입니다.</p>
+          </div>
+          <button class="btn btn-navy" type="submit">조회하기</button>
+        </form>
+        <div class="alert" id="result" role="status" aria-live="polite" hidden></div>
+      </section>
+
+      <aside class="lookup-aside">
+        <h3>시상식</h3>
+        <ul>
+          <li id="aw-date"></li>
+          <li id="aw-target"></li>
+        </ul>
+        <h3>그 밖의 상</h3>
+        <ul><li id="aw-etc"></li></ul>
+        <a class="btn btn-line" href="amc-past.html">기출문제 보기</a>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/common.js"></script>
+<script src="assets/js/amc.js"></script>
+<script>
+  document.getElementById("lk-round").textContent = AMC.round;
+  document.getElementById("aw-date").textContent = AMC.award.date + ", " + AMC.award.place;
+  document.getElementById("aw-target").textContent = AMC.award.target;
+  document.getElementById("aw-etc").textContent = AMC.award.etc;
+  AMC_LOOKUP("score", document.getElementById("lookup"), document.getElementById("result"));
+</script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>협력업체 | 안양시학원연합회</title>
+<meta name="description" content="안양시학원연합회와 업무협약을 맺은 협력업체">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="partners">
+
+<main id="main">
+  <div class="page-body">
+    <div class="wrap">
+      <div class="notice-box">
+        <p>아래 업체는 안양시학원연합회와 업무협약을 맺은 곳으로, 연합회 확인을 받은 정회원 학원만 이용할 수 있습니다. 업체별 혜택과 이용 방법은 <a href="members-only.html"><strong>정회원전용 게시판</strong></a>에서 확인하세요.</p>
+      </div>
+      <ul class="partners" id="partners"></ul>
+    </div>
+  </div>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/common.js"></script>
+<script>
+  document.getElementById("partners").innerHTML = PARTNERS.map(function (p) {
+    return '<li><strong>' + AAOH.esc(p.name) + '</strong><span>' + AAOH.esc(p.field) + '</span></li>';
+  }).join("");
+</script>
+</body>
+</html>

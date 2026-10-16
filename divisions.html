@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>분과 소식 | 안양시학원연합회</title>
+<meta name="description" content="보습·외국어·음악·미술·무용·컴퓨터·웅변·독서분과 소식">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="divisions">
+
+<main id="main">
+  <div class="page-body">
+    <div class="wrap" id="board"></div>
+  </div>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/common.js"></script>
+<script>
+  AAOH.renderBoard("divisions", "#board", { categories: DIVISIONS, showCat: true });
+</script>
+</body>
+</html>

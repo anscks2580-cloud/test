@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>접수확인·수험표 | 안양시학원연합회</title>
+<meta name="description" content="AMC 안양시 수학경시대회 접수확인 및 수험표 출력">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="amc-ticket">
+
+<main id="main">
+  <div class="page-body">
+    <div class="wrap lookup">
+      <section class="lookup-card" aria-labelledby="lk-title">
+        <h2 id="lk-title">수험표 조회</h2>
+        <p class="hint" id="lk-round"></p>
+        <form class="form" id="lookup" style="margin-top:24px" novalidate>
+          <div class="form-row">
+            <label for="name">학생 성명<span class="req" aria-hidden="true">*</span></label>
+            <input class="input" id="name" name="name" autocomplete="off" placeholder="예: 홍길동" required>
+          </div>
+          <div class="form-row">
+            <label for="key">학부모 휴대폰번호<span class="req" aria-hidden="true">*</span></label>
+            <input class="input" id="key" name="key" type="tel" inputmode="numeric" autocomplete="tel" placeholder="예: 010-1234-5678" required>
+            <p class="hint">접수할 때 적은 번호를 입력하세요.</p>
+          </div>
+          <button class="btn btn-navy" type="submit">조회하기</button>
+        </form>
+        <div class="alert" id="result" role="status" aria-live="polite" hidden></div>
+      </section>
+
+      <aside class="lookup-aside">
+        <h3>수험표 교부 기간</h3>
+        <ul><li id="lk-period"></li></ul>
+        <h3>시험 당일</h3>
+        <ul>
+          <li>수험표는 당일 1층 현장 배부처에서도 받을 수 있습니다.</li>
+          <li>오전 10시까지 입실을 마쳐 주세요.</li>
+        </ul>
+        <a class="btn btn-line" href="amc.html">시험 안내 전체 보기</a>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/common.js"></script>
+<script src="assets/js/amc.js"></script>
+<script>
+  document.getElementById("lk-round").textContent = AMC.round;
+  document.getElementById("lk-period").textContent = AMC.ticketPeriod;
+  AMC_LOOKUP("ticket", document.getElementById("lookup"), document.getElementById("result"));
+</script>
+</body>
+</html>

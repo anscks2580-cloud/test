@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AMC 기출문제 | 안양시학원연합회</title>
+<meta name="description" content="AMC 안양시 수학경시대회 학년별 기출문제">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="amc-past">
+
+<main id="main">
+  <div class="page-body">
+    <div class="wrap" id="board"></div>
+  </div>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/common.js"></script>
+<script>
+  var grades = ["초등1", "초등2", "초등3", "초등4", "초등5", "초등6", "중1", "중2", "중3"]
+    .map(function (g) { return { key: g, label: g }; });
+  AAOH.renderBoard("amcPast", "#board", { categories: grades });
+</script>
+</body>
+</html>

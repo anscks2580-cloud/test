@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>정회원 입회 신청 | 안양시학원연합회</title>
+<meta name="description" content="(사)안양시학원연합회 정회원 입회 신청">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="join" data-section="회원" data-title="정회원 입회 신청">
+
+<main id="main">
+  <div class="page-body">
+    <div class="wrap narrow">
+
+      <div class="notice-box" id="sent" hidden>
+        <p><strong>입회 신청서를 보냈습니다.</strong> 사무국에서 확인한 뒤 연락드리겠습니다.</p>
+      </div>
+
+      <div class="prose" style="margin-bottom:36px">
+        <p>정회원이 되면 협력업체 혜택, 정회원 전용 게시판, 연합회 연수·교육 안내를 받을 수 있습니다. 신청서를 보내면 사무국이 확인한 뒤 회비 자동이체(CMS) 동의서 작성 방법을 따로 안내해 드립니다.</p>
+      </div>
+
+      <form class="form" id="join-form" method="POST">
+        <input type="hidden" name="_subject" value="[홈페이지] 정회원 입회 신청">
+        <input type="hidden" name="_template" value="table">
+        <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+
+        <div class="form-2">
+          <div class="form-row">
+            <label for="academy">학원명<span class="req" aria-hidden="true">*</span></label>
+            <input class="input" id="academy" name="학원명" required>
+          </div>
+          <div class="form-row">
+            <label for="owner">원장 성명<span class="req" aria-hidden="true">*</span></label>
+            <input class="input" id="owner" name="원장 성명" autocomplete="name" required>
+          </div>
+        </div>
+
+        <div class="form-2">
+          <div class="form-row">
+            <label for="division">소속 분과<span class="req" aria-hidden="true">*</span></label>
+            <select class="select" id="division" name="소속 분과" required>
+              <option value="">선택하세요</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label for="subject">교습 과목</label>
+            <input class="input" id="subject" name="교습 과목" placeholder="예: 수학, 영어">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label for="address">학원 주소<span class="req" aria-hidden="true">*</span></label>
+          <input class="input" id="address" name="학원 주소" autocomplete="street-address" required>
+        </div>
+
+        <div class="form-2">
+          <div class="form-row">
+            <label for="phone">연락처<span class="req" aria-hidden="true">*</span></label>
+            <input class="input" id="phone" name="연락처" type="tel" inputmode="numeric" autocomplete="tel" placeholder="010-0000-0000" required>
+          </div>
+          <div class="form-row">
+            <label for="email">이메일</label>
+            <input class="input" id="email" name="email" type="email" autocomplete="email">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label for="memo">하고 싶은 말</label>
+          <textarea class="textarea" id="memo" name="문의 내용"></textarea>
+        </div>
+
+        <div class="consent">
+          <p>수집 항목: 학원명, 원장 성명, 소속 분과, 교습 과목, 학원 주소, 연락처, 이메일<br>
+          이용 목적: 정회원 입회 확인 및 연락<br>
+          보유 기간: 탈퇴 시까지 (가입하지 않으면 확인 후 즉시 파기)</p>
+          <label class="check"><input type="checkbox" required name="개인정보 동의" value="동의"> 개인정보 수집·이용에 동의합니다</label>
+        </div>
+
+        <p class="hint">계좌번호 등 금융정보는 이 신청서에 적지 마세요. 자동이체 동의서는 사무국에서 따로 받습니다.</p>
+
+        <div class="form-actions">
+          <button class="btn btn-navy" type="submit">입회 신청서 보내기</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/common.js"></script>
+<script>
+  var form = document.getElementById("join-form");
+  form.action = "https://formsubmit.co/" + SITE.formEmail;
+  var next = document.createElement("input");
+  next.type = "hidden"; next.name = "_next";
+  next.value = location.href.split("?")[0] + "?sent=1";
+  form.appendChild(next);
+
+  document.getElementById("division").insertAdjacentHTML("beforeend",
+    DIVISIONS.map(function (d) { return '<option>' + AAOH.esc(d.label) + '</option>'; }).join(""));
+
+  if (AAOH.qs("sent")) {
+    var box = document.getElementById("sent");
+    box.hidden = false;
+    form.hidden = true;
+    box.scrollIntoView();
+  }
+</script>
+</body>
+</html>

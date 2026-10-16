@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>오시는길 | 안양시학원연합회</title>
+<meta name="description" content="(사)안양시학원연합회 사무국 위치와 교통편">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="location">
+
+<main id="main">
+  <div class="page-body">
+    <div class="wrap">
+      <div class="map">
+        <iframe title="안양시학원연합회 사무국 지도"
+          src="https://maps.google.com/maps?q=%EA%B2%BD%EA%B8%B0%EB%8F%84%20%EC%95%88%EC%96%91%EC%8B%9C%20%EB%A7%8C%EC%95%88%EA%B5%AC%20%EB%8D%95%EC%B2%9C%EB%A1%9C152%EB%B2%88%EA%B8%B8%2025&z=16&output=embed"
+          loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+
+      <div class="narrow">
+        <dl class="facts">
+          <dt>주소</dt>
+          <dd id="addr"></dd>
+          <dt>전화</dt>
+          <dd id="tel"></dd>
+          <dt>버스</dt>
+          <dd>아이에스비즈타워 또는 덕천초등학교 정류장 하차<br>지선 10, 5-3, 70</dd>
+          <dt>지하철</dt>
+          <dd>1호선 안양역 2번 출구에서 걸어서 18분</dd>
+          <dt>사무국 운영</dt>
+          <dd id="hours"></dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/common.js"></script>
+<script>
+  document.getElementById("addr").textContent = SITE.address;
+  document.getElementById("tel").innerHTML = '<a href="tel:' + SITE.tel.replace(/[^0-9]/g, "") + '">' + SITE.tel + '</a>';
+  document.getElementById("hours").textContent = SITE.hours;
+</script>
+</body>
+</html>
