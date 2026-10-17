@@ -265,11 +265,16 @@
     try { if (localStorage.getItem(key) && Number(localStorage.getItem(key)) > Date.now()) return; } catch (e) {}
     var box = el(
       '<div class="popup" role="dialog" aria-labelledby="popup-title">' +
-        '<div class="popup-body">' +
-          '<h2 id="popup-title">' + esc(p.title) + '</h2>' +
-          '<p>' + esc(p.text) + '</p>' +
-          (p.link ? '<a class="btn btn-primary" href="' + esc(p.link) + '">' + esc(p.linkText || "자세히 보기") + '</a>' : "") +
-        '</div>' +
+        (p.image
+          ? '<div class="popup-image"><h2 id="popup-title" class="sr-only">' + esc(p.title) + '</h2>' +
+              (p.link ? '<a href="' + esc(p.link) + '">' : "") +
+              '<img src="' + esc(p.image) + '" alt="' + esc(p.title + ". " + (p.text || "")) + '">' +
+              (p.link ? '</a>' : "") + '</div>'
+          : '<div class="popup-body">' +
+              '<h2 id="popup-title">' + esc(p.title) + '</h2>' +
+              '<p>' + esc(p.text) + '</p>' +
+              (p.link ? '<a class="btn btn-primary" href="' + esc(p.link) + '">' + esc(p.linkText || "자세히 보기") + '</a>' : "") +
+            '</div>') +
         '<div class="popup-foot">' +
           '<label><input type="checkbox" class="popup-hide"> 24시간 동안 보지 않기</label>' +
           '<button type="button" class="popup-close">닫기</button>' +
@@ -400,16 +405,20 @@
     var course = board.course
       ? '<dl class="course-meta"><div><dt>신청기간</dt><dd>' + esc(post.apply) + '</dd></div><div><dt>교육기간</dt><dd>' + esc(post.period) + '</dd></div><div><dt>교육장소</dt><dd>' + esc(post.place) + '</dd></div></dl>'
       : "";
+    var images = (post.images || []).map(function (src, i) {
+      return '<figure class="post-figure"><a href="' + esc(src) + '" target="_blank" rel="noopener" aria-label="사진 ' + (i + 1) + ' 크게 보기 (새 창)">' +
+        '<img src="' + esc(src) + '" alt="' + esc(post.title) + ' 사진 ' + (i + 1) + '"' + (i > 1 ? ' loading="lazy"' : "") + '></a></figure>';
+    }).join("");
     var body = post.body
       ? post.body
-      : '<p class="pending">본문은 기존 홈페이지 자료를 옮기는 대로 올라옵니다.</p>';
+      : (images ? "" : '<p class="pending">본문은 기존 홈페이지 자료를 옮기는 대로 올라옵니다.</p>');
 
     root.innerHTML =
       '<article class="post">' +
         '<header class="post-head"><p class="post-board">' + esc(board.title) + '</p>' +
         '<h2 class="post-title">' + esc(post.title) + '</h2><p class="post-meta">' + meta + '</p></header>' +
         course +
-        '<div class="post-body">' + body + '</div>' +
+        '<div class="post-body">' + body + (images ? '<div class="post-images">' + images + '</div>' : "") + '</div>' +
         (post.files && post.files.length ? '<ul class="post-files">' + post.files.map(function (f) {
           return '<li><a href="' + esc(f.url) + '" download>' + esc(f.name) + '</a></li>';
         }).join("") + '</ul>' : "") +

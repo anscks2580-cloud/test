@@ -383,6 +383,9 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .post-body a { text-decoration: underline; }
 .post-body .btn { text-decoration: none; }
 .post-body .hint { font-size: 13px; }
+.post-images { display: grid; gap: 14px; margin-top: 8px; }
+.post-figure { margin: 0; }
+.post-figure img { display: block; width: 100%; height: auto; margin: 0; border: 1px solid var(--line); }
 .pending { color: var(--muted); }
 .post-files { list-style: none; border: 1px solid var(--line); padding: 10px 14px; margin-bottom: 24px; background: var(--tab-bg); font-size: 13px; }
 .post-files a { text-decoration: underline; }
@@ -450,6 +453,15 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .partners li { padding: 12px 4px; border-bottom: 1px solid var(--line); }
 .partners strong { display: block; font-size: 14px; font-weight: 500; color: var(--ink); }
 .partners span { color: var(--muted); font-size: 12px; }
+.partner-photo, .center-photo { display: block; aspect-ratio: 3 / 2; overflow: hidden; background: var(--paper); border: 1px solid var(--line); margin-bottom: 10px; }
+.center-photo { aspect-ratio: 4 / 3; }
+.partner-photo img { width: 100%; height: 100%; object-fit: contain; }
+.center-photo img { width: 100%; height: 100%; object-fit: cover; }
+.partners details { margin-top: 6px; font-size: 13px; }
+.partners summary { cursor: pointer; color: var(--tab-ink); }
+.partners details img { display: block; width: 100%; height: auto; margin-top: 8px; border: 1px solid var(--line); }
+.centers-intro { display: grid; gap: 10px; margin-bottom: 24px; }
+.centers-intro img { display: block; width: 100%; height: auto; }
 
 /* 잠금 화면 */
 .locked { text-align: center; padding: 50px 20px; border: 1px solid var(--line-2); background: var(--tab-bg); }
@@ -459,6 +471,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 /* 팝업 */
 .popup { position: fixed; left: 24px; top: 100px; z-index: 70; width: min(340px, calc(100vw - 32px)); background: var(--paper); border: 1px solid var(--line-2); }
 .popup-body { padding: 22px; }
+.popup-image img { display: block; width: 100%; height: auto; }
 .popup-body h2 { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
 .popup-foot { display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; background: var(--title); color: #fff; font-size: 12px; }
 .popup-foot label { display: flex; gap: 5px; align-items: center; cursor: pointer; }

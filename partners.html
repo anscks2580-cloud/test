@@ -23,8 +23,15 @@
 <script src="assets/js/data.js"></script>
 <script src="assets/js/common.js"></script>
 <script>
+  var e = AAOH.esc;
   document.getElementById("partners").innerHTML = PARTNERS.map(function (p) {
-    return '<li><strong>' + AAOH.esc(p.name) + '</strong><span>' + AAOH.esc(p.field) + '</span></li>';
+    var photo = p.photo ? '<span class="partner-photo"><img src="' + e(p.photo) + '" alt="" loading="lazy"></span>' : "";
+    var more = (p.images && p.images.length)
+      ? '<details><summary>안내 이미지 보기 (' + p.images.length + '장)</summary>' + p.images.map(function (src, i) {
+          return '<img src="' + e(src) + '" alt="' + e(p.name) + ' 안내 ' + (i + 1) + '" loading="lazy">';
+        }).join("") + '</details>'
+      : "";
+    return '<li>' + photo + '<strong>' + e(p.name) + '</strong><span>' + e(p.field) + '</span>' + more + '</li>';
   }).join("");
 </script>
 </body>

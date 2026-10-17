@@ -12,6 +12,7 @@
 <main id="main">
   <div class="page-body">
     <div class="wrap">
+      <div class="centers-intro" id="intro"></div>
       <div class="notice-box">
         <p>아래 지정 접수처 학원에서 AMC 안양시 수학경시대회를 접수할 수 있습니다. 접수 일정은 공지사항을 확인해 주세요.</p>
       </div>
@@ -25,12 +26,16 @@
 <script src="assets/js/common.js"></script>
 <script>
   var e = AAOH.esc;
+  document.getElementById("intro").innerHTML = (AMC.centersIntro || []).map(function (src, i) {
+    return '<img src="' + e(src) + '" alt="' + (i === 0 ? "안양시학원연합회가 함께하는 믿을 수 있는 공식 지정접수처입니다." : "지정접수처에서 AMC 접수·안내, 시험 범위·응시 방법 상담, 시험 대비 자료, 대회 일정·정보를 제공합니다.") + '">';
+  }).join("");
   document.getElementById("count").textContent = AMC.centers.length;
   document.getElementById("centers").innerHTML = AMC.centers.map(function (c) {
     var links = [];
     if (c.site) links.push('<a href="' + e(c.site) + '" target="_blank" rel="noopener">홈페이지</a>');
     if (c.blog) links.push('<a href="' + e(c.blog) + '" target="_blank" rel="noopener">블로그</a>');
     return '<li id="c' + c.id + '">' +
+      (c.image ? '<span class="center-photo"><img src="' + e(c.image) + '" alt="" loading="lazy"></span>' : "") +
       '<h2 class="center-name">' + e(c.name) + '</h2>' +
       '<p class="center-addr">' + e(c.address) + '</p>' +
       '<p class="center-meta"><a href="tel:' + c.tel.replace(/[^0-9]/g, "") + '">' + e(c.tel) + '</a>' +
