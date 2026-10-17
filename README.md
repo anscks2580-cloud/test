@@ -7,7 +7,10 @@ GitHub Pages로 올리는 정적 홈페이지입니다. 빌드 과정 없이 파
 | 바꿀 내용 | 파일 |
 | --- | --- |
 | 전화·이메일·주소·팝업·외부 배너 | `assets/js/data.js` 맨 위 `SITE` |
-| 공지사항·행사·분과 소식 글 추가 | `assets/js/data.js` 의 `BOARDS` (본문은 `body`, 첨부는 `files`, 행사 사진은 `thumb`) |
+| 공지사항·행사·분과 소식 글 추가 | `assets/js/data.js` 의 `BOARDS` (본문은 `body`, 첨부는 `files`, 목록 썸네일은 `thumb`, 본문 사진은 `images`) |
+| 게시물 사진 파일 | `assets/img/posts/게시판/글번호/` (01.jpg, 02.jpg … 와 thumb.jpg) |
+| 메인 사진·서브 상단·로고·팝업 이미지 | `assets/img/site/` 에 넣고 `SITE` 의 `slides`, `subVisual`, `logo`, `popup.image` 경로 입력 |
+| 협력업체·접수처 학원 사진 | `assets/img/partners/`, `assets/img/centers/` (`PARTNERS` 의 `photo`, `AMC.centers` 의 `image`) |
 | 역대회장 사진 | `assets/img/presidents/` 에 넣고 `PRESIDENTS` 의 `photo` 에 경로 입력 |
 | 조직 | `ORGANIZATION` |
 | 협력업체 | `PARTNERS` |
@@ -20,7 +23,7 @@ GitHub Pages로 올리는 정적 홈페이지입니다. 빌드 과정 없이 파
 - **회원가입 / 로그인 / 정회원전용**: 약관 동의·로그인 화면만 있음. 회원 시스템(Firebase Auth 등) 연결 필요. 기존 사이트의 가입 양식 항목은 확인하지 못함.
 - **AMC 수험표·성적 조회**: 화면과 출력 양식은 완성. 학생 개인정보라 데이터는 이 저장소에 넣지 말고 외부 DB에 두고 `assets/js/amc.js` 의 `AMC_API` 로 연결. 연결 후 `data.js` 에서 `ticketOpen`, `scoreOpen` 을 `true` 로.
 - **정회원 입회 신청**: FormSubmit 으로 `SITE.formEmail` 에 메일 발송. 처음 한 번은 FormSubmit 인증 메일을 확인해야 접수가 시작됨.
-- **게시물 본문·사진**: 연수·법정의무교육 과정 2건만 본문 입력됨. 나머지는 기존 사이트 DB 받은 뒤 `body`, `thumb`, `files` 채우기. 역대회장 사진 7장, 로고, 행사 사진도 같은 방식.
+- **게시물 본문 글**: 사진은 기존 사이트에서 모두 옮김(가로 1200px 이하로 줄여 저장). 글은 연수·법정의무교육 과정 2건만 입력됨. 나머지는 기존 사이트 DB 받은 뒤 `body`, `files` 채우기.
 
 ## 도메인 연결 순서
 
